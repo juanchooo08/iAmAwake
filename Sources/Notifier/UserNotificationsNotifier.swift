@@ -1,10 +1,10 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Implementacion de `Notifying` sobre `UNUserNotificationCenter`.
 ///
 /// La autorizacion se pide una sola vez y el resultado queda recordado. Si el
-/// usuario la niega no se crashea: se registra y se sigue (StillOn funciona igual,
+/// usuario la niega no se crashea: se registra y se sigue (iAmAwake funciona igual,
 /// solo que en silencio).
 public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
 
@@ -30,7 +30,7 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
         await send(payload)
     }
 
-    public func notifyFailure(_ error: StillOnError) async {
+    public func notifyFailure(_ error: AwakeError) async {
         await send(NotificationTexts.failure(error))
     }
 
@@ -38,7 +38,7 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
 
     private func send(_ payload: NotificationPayload) async {
         guard await ensureAuthorized() else {
-            NSLog("[StillOn] notificacion no entregada (permiso denegado): \(payload.body)")
+            NSLog("[iAmAwake] notificacion no entregada (permiso denegado): \(payload.body)")
             return
         }
         await center.deliver(payload)

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import StillOnCore
+@testable import AwakeCore
 
 /// Flujo completo con dobles de todo lo que toca el sistema: ni IOKit, ni pmset,
 /// ni la barra de menu, ni el daemon real.
@@ -137,7 +137,7 @@ struct EndToEndTests {
         #expect(h.state.lastError == .helperUnavailable)
 
         let body = h.deliverer.payloads.last?.body ?? ""
-        #expect(body.contains("stillond") || body.contains("daemon"),
+        #expect(body.contains("iamawaked") || body.contains("daemon"),
                 "el usuario tiene que saber que el cierre de tapa NO esta cubierto")
     }
 

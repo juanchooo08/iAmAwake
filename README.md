@@ -1,7 +1,7 @@
-# StillOnLocal
+# iAmAwake
 
 App de barra de menú que evita que tu MacBook duerma con la tapa cerrada, para
-dejar corriendo Claude Code, builds y descargas. Reemplazo local de StillOn, uso
+dejar corriendo Claude Code, builds y descargas. Reemplazo local de iAmAwake, uso
 personal, sin distribución.
 
 Verificado en **MacBook Air M1 (MacBookAir10,1), macOS 26.6.2**. Nada más.
@@ -22,7 +22,7 @@ cerrada, **con batería**, sin periféricos.
 Eso exige root. Por eso hay dos procesos:
 
 ```
-StillOn.app (tu usuario, sin privilegios)        stillond (root, LaunchDaemon)
+iAmAwake.app (tu usuario, sin privilegios)        iamawaked (root, LaunchDaemon)
 ├─ barra de menú, hotkey, guardas          <──>  ├─ pmset disablesleep
 └─ socket Unix 0600                        JSON  └─ dead man's switch
 ```
@@ -36,9 +36,9 @@ contraseña.
 swift build -c release          # o Scripts/build-app.sh para el .app
 sudo Scripts/install-helper.sh  # única vez que pide contraseña
 Scripts/build-app.sh
-cp -R build/StillOn.app /Applications/
-xattr -cr /Applications/StillOn.app
-open /Applications/StillOn.app
+cp -R build/iAmAwake.app /Applications/
+xattr -cr /Applications/iAmAwake.app
+open /Applications/iAmAwake.app
 ```
 
 ## Uso
@@ -52,6 +52,25 @@ Clic en el ícono o ⌃⌥S (configurable) para armar y desarmar.
 | `battery.25` | Desarmado solo por batería baja |
 | `thermometer.high` | Desarmado solo por temperatura |
 | `exclamationmark.triangle` | Error — la app te dice cuál |
+
+Armado, el ícono **late** despacio. Es el único feedback que se ve sin abrir el
+menú. Respeta «Reducir movimiento» del sistema: con eso activado se queda quieto.
+
+### La animación del párpado
+
+Al cerrar y al abrir la tapa se dibuja un párpado que intenta cerrarse y se
+frena: el ojo queda abierto. Solo aparece **si estás armado** — es la prueba de
+que iAmAwake está haciendo algo, y con la app desarmada no estaría haciendo nada.
+Al abrir te dice cuánto aguantó (`47 min con la tapa cerrada`).
+
+Para verla sin cerrar la tapa:
+
+```bash
+/Applications/iAmAwake.app/Contents/MacOS/iAmAwake --demo-overlay opening
+/Applications/iAmAwake.app/Contents/MacOS/iAmAwake --demo-overlay closing
+```
+
+Se apaga desde Preferencias.
 
 ## El dead man's switch
 
@@ -90,10 +109,19 @@ Además fuerza `disablesleep 0` al arrancar, por si quedó colgado de un crash.
    registrarla. Si otra app la tiene tomada, falla ahí y te avisa.
 8. **`Preferences` duplica el formateador de hotkey** de `Hotkey`, porque el
    contrato prohíbe la dependencia cruzada. Cosmético.
+9. **La animación de cierre casi no se ve, y no tiene arreglo.** macOS reporta la
+   tapa con un booleano (`AppleClamshellState`) que cambia recién a ~5° del
+   cierre, y el backlight se apaga a los ~0,2 s. El sensor de ángulo que daría
+   una animación progresiva existe solo en los MacBook Pro 2021+, que lo publican
+   por HID en la usage page 0x20; verificado con `ioreg` en este MacBookAir10,1:
+   cero dispositivos ahí. La animación que se ve de verdad es la de apertura.
+10. **La animación dibuja solo en `NSScreen.main`.** Con monitores externos, las
+   otras pantallas no muestran nada.
 
 ## Lo que falta (roadmap)
 
 - Login item: que arranque sola al iniciar sesión.
+- Animación en todas las pantallas, no solo la principal.
 - Temporizador: armar por N horas y que se desarme sola.
 - Reglas por aplicación: armar solo si cierto proceso está corriendo.
 - Historial de por qué se desarmó, más allá de la notificación del momento.
@@ -120,11 +148,11 @@ dobles inyectados.
 
 ```bash
 sudo Scripts/uninstall-helper.sh
-rm -rf /Applications/StillOn.app
+rm -rf /Applications/iAmAwake.app
 ```
 
 ## Estructura
 
-Ver [ARCHITECTURE.md](ARCHITECTURE.md). Regla: todo depende de `StillOnCore`,
-ningún módulo de implementación depende de otro, y solo `StillOnApp` los conoce
+Ver [ARCHITECTURE.md](ARCHITECTURE.md). Regla: todo depende de `AwakeCore`,
+ningún módulo de implementación depende de otro, y solo `AwakeApp` los conoce
 a todos.

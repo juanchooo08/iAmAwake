@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 import UserNotifications
 
 /// Contenido de una notificacion, ya resuelto a texto.
@@ -40,7 +40,7 @@ public final class UNCenterAdapter: NotificationDelivering, @unchecked Sendable 
         do {
             return try await center.requestAuthorization(options: [.alert, .sound])
         } catch {
-            NSLog("[StillOn] no se pudo pedir permiso de notificaciones: \(error.localizedDescription)")
+            NSLog("[iAmAwake] no se pudo pedir permiso de notificaciones: \(error.localizedDescription)")
             return false
         }
     }
@@ -59,7 +59,7 @@ public final class UNCenterAdapter: NotificationDelivering, @unchecked Sendable 
         do {
             try await center.add(request)
         } catch {
-            NSLog("[StillOn] no se pudo entregar la notificacion: \(error.localizedDescription)")
+            NSLog("[iAmAwake] no se pudo entregar la notificacion: \(error.localizedDescription)")
         }
     }
 }

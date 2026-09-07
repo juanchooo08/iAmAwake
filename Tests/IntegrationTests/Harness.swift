@@ -4,7 +4,7 @@ import Guards
 import MenuBar
 import Notifier
 import Preferences
-import StillOnCore
+import AwakeCore
 
 /// Presentador de mentira: usa el `StatusPresentation` real de `MenuBar` (los
 /// iconos y textos que veria el usuario) sin instanciar un `NSStatusItem`.
@@ -91,11 +91,11 @@ final class Harness {
         battery: PowerSnapshot = .plugged(100),
         thermal: ThermalLevel = .nominal,
         lidInstallState: HelperInstallState = .ready(protocolVersion: Wire.protocolVersion),
-        lidFailure: StillOnError? = nil,
-        inhibitorFailure: StillOnError? = nil,
+        lidFailure: AwakeError? = nil,
+        inhibitorFailure: AwakeError? = nil,
         notificationsGranted: Bool = true
     ) {
-        self.suiteName = "dev.local.stillon.integration.\(UUID().uuidString)"
+        self.suiteName = "dev.local.iamawake.integration.\(UUID().uuidString)"
         self.defaults = UserDefaults(suiteName: suiteName)!
 
         let store = UserDefaultsPreferencesStore(defaults: defaults)

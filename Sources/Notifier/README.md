@@ -26,7 +26,7 @@ que enterarse y saber **por qué**.
 ## Cómo se testea
 
 Con un espía de `NotificationDelivering`. No dispara notificaciones reales. Los
-tests verifican que cada `DisarmReason` y cada `StillOnError` produzcan un texto
+tests verifican que cada `DisarmReason` y cada `AwakeError` produzcan un texto
 distinto, no vacío, y que los motivos silenciosos no entreguen nada.
 
 ```

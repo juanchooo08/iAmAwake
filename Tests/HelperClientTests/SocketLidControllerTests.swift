@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 import Testing
 
 @testable import HelperClient
@@ -16,7 +16,7 @@ import Testing
     private let plistPath: String
 
     init() {
-        plistPath = "/tmp/stillond-test-plist-\(UUID().uuidString.prefix(8)).plist"
+        plistPath = "/tmp/iamawaked-test-plist-\(UUID().uuidString.prefix(8)).plist"
         FileManager.default.createFile(atPath: plistPath, contents: Data("<plist/>".utf8))
     }
 
@@ -87,7 +87,7 @@ import Testing
     }
 
     @Test func testInstallStateIsInstalledNotRunningWhenSocketIsDead() async throws {
-        let controller = makeController(socketPath: "/tmp/stillond-inexistente-\(UUID().uuidString)")
+        let controller = makeController(socketPath: "/tmp/iamawaked-inexistente-\(UUID().uuidString)")
         let state = await controller.installState
         #expect(state == .installedNotRunning)
     }
@@ -139,7 +139,7 @@ import Testing
         do {
             try await controller.setClamshellSleepDisabled(true)
             Issue.record("deberia haber lanzado")
-        } catch StillOnError.helperRefused(let message) {
+        } catch AwakeError.helperRefused(let message) {
             #expect(!(message.isEmpty))
         }
     }
@@ -157,7 +157,7 @@ import Testing
     }
 
     @Test func testMissingSocketMapsToHelperUnavailable() async {
-        let controller = makeController(socketPath: "/tmp/stillond-inexistente-\(UUID().uuidString)")
+        let controller = makeController(socketPath: "/tmp/iamawaked-inexistente-\(UUID().uuidString)")
         await assertThrows(.helperUnavailable) {
             try await controller.setClamshellSleepDisabled(true)
         }
@@ -230,13 +230,13 @@ import Testing
     // MARK: - Utilidades
 
     private func assertThrows(
-        _ expected: StillOnError,
+        _ expected: AwakeError,
         _ body: () async throws -> Void
     ) async {
         do {
             try await body()
             Issue.record("deberia haber lanzado \(expected)")
-        } catch let error as StillOnError {
+        } catch let error as AwakeError {
             #expect(error == expected)
         } catch {
             Issue.record("error inesperado: \(error)")

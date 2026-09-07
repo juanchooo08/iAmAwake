@@ -1,11 +1,11 @@
 import Foundation
 
-/// Protocolo de cable entre StillOn.app (usuario) y stillond (root).
+/// Protocolo de cable entre iAmAwake.app (usuario) y iamawaked (root).
 /// JSON delimitado por "\n" sobre un socket Unix.
 public enum Wire {
     public static let protocolVersion = 1
-    public static let socketPath = "/var/run/stillond.sock"
-    public static let daemonLabel = "dev.local.stillond"
+    public static let socketPath = "/var/run/iamawaked.sock"
+    public static let daemonLabel = "dev.local.iamawaked"
     /// Si el daemon no recibe nada en este lapso, revierte solo.
     public static let heartbeatTimeout: TimeInterval = 30
     /// Cada cuanto manda heartbeat la app.

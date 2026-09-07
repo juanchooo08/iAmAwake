@@ -3,7 +3,7 @@ import Foundation
 import Testing
 
 @testable import Hotkey
-import StillOnCore
+import AwakeCore
 
 @Suite struct HotkeyFormatterTests {
     @Test func testDefaultComboIsControlOptionS() {

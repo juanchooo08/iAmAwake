@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Daemon falso: habla el mismo protocolo de cable en un socket Unix temporal.
 ///
@@ -48,7 +48,7 @@ final class FakeDaemon: @unchecked Sendable {
     init(handler: @escaping @Sendable (Wire.Request?) -> Reply) throws {
         // /tmp y no NSTemporaryDirectory(): `sun_path` tiene 104 bytes y las rutas
         // de /var/folders/... se pasan de largo con facilidad.
-        directory = "/tmp/stillond-test-\(UUID().uuidString.prefix(8))"
+        directory = "/tmp/iamawaked-test-\(UUID().uuidString.prefix(8))"
         path = "\(directory)/sock"
         self.handler = handler
         try FileManager.default.createDirectory(

@@ -1,21 +1,21 @@
 #!/bin/bash
 #
-# install-helper.sh — instala el daemon root `stillond`.
+# install-helper.sh — instala el daemon root `iamawaked`.
 #
 # Se corre UNA sola vez, con sudo. Lee esto entero antes: te va a instalar un
 # proceso que corre como root y arranca con la maquina.
 #
-#   sudo ./Scripts/install-helper.sh [ruta/al/binario/stillond]
+#   sudo ./Scripts/install-helper.sh [ruta/al/binario/iamawaked]
 #
 # QUE HACE, exactamente:
-#   1. Copia el binario `stillond` a /usr/local/libexec/stillond (root:wheel 0755).
-#   2. Escribe /Library/LaunchDaemons/dev.local.stillond.plist (root:wheel 0644),
+#   1. Copia el binario `iamawaked` a /usr/local/libexec/iamawaked (root:wheel 0755).
+#   2. Escribe /Library/LaunchDaemons/dev.local.iamawaked.plist (root:wheel 0644),
 #      con TU uid adentro (el de quien corre el sudo, via $SUDO_UID).
 #   3. Lo carga con `launchctl bootstrap system`.
 #
 # QUE PODRA HACER ESE DAEMON:
 #   Solo una cosa: ejecutar `pmset -a disablesleep 0|1`. Nada mas. No abre red,
-#   no lee tus archivos, no persiste datos. El codigo esta en Sources/stillond.
+#   no lee tus archivos, no persiste datos. El codigo esta en Sources/iamawaked.
 #
 # QUIEN PODRA HABLARLE:
 #   Escucha en un socket Unix con permisos 0600 y dueño = tu uid. Solo vos (y
@@ -27,20 +27,40 @@
 #
 set -euo pipefail
 
-LABEL="dev.local.stillond"
+LABEL="dev.local.iamawaked"
 PLIST="/Library/LaunchDaemons/${LABEL}.plist"
 INSTALL_DIR="/usr/local/libexec"
-INSTALL_PATH="${INSTALL_DIR}/stillond"
-SOCKET="/var/run/stillond.sock"
-LOG_DIR="/var/log/stillon"
+INSTALL_PATH="${INSTALL_DIR}/iamawaked"
+SOCKET="/var/run/iamawaked.sock"
+LOG_DIR="/var/log/iamawake"
+
+# Nombres previos al renombre a iAmAwake. Se limpian solos para no dejar dos
+# daemons peleandose por el mismo interruptor de tapa.
+LEGACY_LABELS="dev.local.stillond"
+LEGACY_BINARIES="/usr/local/libexec/stillond"
 
 # --- 1. Tiene que correr como root -------------------------------------------
 # Sin root no se puede escribir en /Library/LaunchDaemons ni cargar el daemon.
 if [ "$(id -u)" -ne 0 ]; then
   echo "error: hay que correrlo con sudo." >&2
-  echo "       sudo $0 [ruta/al/binario/stillond]" >&2
+  echo "       sudo $0 [ruta/al/binario/iamawaked]" >&2
   exit 1
 fi
+
+# --- 1.5 Limpiar la instalacion vieja de StillOn -----------------------------
+# El daemon viejo escribe el mismo `pmset disablesleep`. Si queda vivo, desarmar
+# desde iAmAwake no alcanzaria para que la Mac vuelva a dormir.
+for legacy in $LEGACY_LABELS; do
+  if launchctl print "system/${legacy}" >/dev/null 2>&1; then
+    echo "  quitando el daemon viejo ${legacy}"
+    launchctl bootout "system/${legacy}" 2>/dev/null || true
+  fi
+  rm -f "/Library/LaunchDaemons/${legacy}.plist"
+done
+for legacy in $LEGACY_BINARIES; do
+  rm -f "$legacy"
+done
+rm -f /var/run/stillond.sock
 
 # --- 2. De quien va a ser el socket ------------------------------------------
 # $SUDO_UID es el uid del usuario que invoco sudo, no el 0 de root. Ese es el
@@ -60,18 +80,18 @@ PACKAGE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SOURCE_BINARY="${1:-}"
 if [ -z "$SOURCE_BINARY" ]; then
   for candidate in \
-    "${PACKAGE_DIR}/.build/release/stillond" \
-    "${PACKAGE_DIR}/.build/debug/stillond" \
-    "${PACKAGE_DIR}/.build-helper/release/stillond" \
-    "${PACKAGE_DIR}/.build-helper/debug/stillond"; do
+    "${PACKAGE_DIR}/.build/release/iamawaked" \
+    "${PACKAGE_DIR}/.build/debug/iamawaked" \
+    "${PACKAGE_DIR}/.build-helper/release/iamawaked" \
+    "${PACKAGE_DIR}/.build-helper/debug/iamawaked"; do
     if [ -x "$candidate" ]; then SOURCE_BINARY="$candidate"; break; fi
   done
 fi
 if [ -z "$SOURCE_BINARY" ] || [ ! -x "$SOURCE_BINARY" ]; then
-  echo "error: no encontre el binario 'stillond'." >&2
+  echo "error: no encontre el binario 'iamawaked'." >&2
   echo "       Compilalo primero:" >&2
-  echo "         swift build -c release --package-path \"${PACKAGE_DIR}\" --product stillond" >&2
-  echo "       o pasame la ruta:  sudo $0 /ruta/a/stillond" >&2
+  echo "         swift build -c release --package-path \"${PACKAGE_DIR}\" --product iamawaked" >&2
+  echo "       o pasame la ruta:  sudo $0 /ruta/a/iamawaked" >&2
   exit 1
 fi
 
@@ -120,9 +140,9 @@ cat > "$PLIST" <<PLIST_EOF
     <key>ProcessType</key>
     <string>Background</string>
     <key>StandardOutPath</key>
-    <string>${LOG_DIR}/stillond.out.log</string>
+    <string>${LOG_DIR}/iamawaked.out.log</string>
     <key>StandardErrorPath</key>
-    <string>${LOG_DIR}/stillond.err.log</string>
+    <string>${LOG_DIR}/iamawaked.err.log</string>
 </dict>
 </plist>
 PLIST_EOF
@@ -135,5 +155,5 @@ launchctl bootstrap system "$PLIST"
 
 echo
 echo "Listo. El daemon corre como root y escucha en ${SOCKET} (0600, dueño ${TARGET_USER})."
-echo "Ver su log:      log stream --predicate 'subsystem == \"dev.local.stillon\"'"
+echo "Ver su log:      log stream --predicate 'subsystem == \"dev.local.iamawake\"'"
 echo "Desinstalarlo:   sudo ${SCRIPT_DIR}/uninstall-helper.sh"

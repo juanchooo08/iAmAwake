@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# uninstall-helper.sh — saca el daemon root `stillond` y deja la maquina como estaba.
+# uninstall-helper.sh — saca el daemon root `iamawaked` y deja la maquina como estaba.
 #
 #   sudo ./Scripts/uninstall-helper.sh
 #
@@ -15,10 +15,10 @@
 #
 set -euo pipefail
 
-LABEL="dev.local.stillond"
+LABEL="dev.local.iamawaked"
 PLIST="/Library/LaunchDaemons/${LABEL}.plist"
-INSTALL_PATH="/usr/local/libexec/stillond"
-SOCKET="/var/run/stillond.sock"
+INSTALL_PATH="/usr/local/libexec/iamawaked"
+SOCKET="/var/run/iamawaked.sock"
 
 # --- 0. Tiene que correr como root -------------------------------------------
 if [ "$(id -u)" -ne 0 ]; then
@@ -51,4 +51,4 @@ done
 echo
 echo "Estado final de disablesleep:"
 /usr/bin/pmset -g | grep -i disablesleep || echo "  (pmset no lo reporta: ya no esta forzado)"
-echo "Listo. No queda nada de StillOn corriendo como root."
+echo "Listo. No queda nada de iAmAwake corriendo como root."

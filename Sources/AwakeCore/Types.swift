@@ -8,7 +8,7 @@ public enum ThermalLevel: Int, Comparable, Codable, Sendable {
 
 public enum GuardID: String, Codable, Sendable, CaseIterable { case battery, thermal }
 
-public enum StillOnError: Error, Equatable, Sendable {
+public enum AwakeError: Error, Equatable, Sendable {
     case assertionFailed(kern_return_t)
     case helperUnavailable
     case helperRefused(String)
@@ -21,7 +21,7 @@ public enum DisarmReason: Equatable, Sendable {
     case user
     case lowBattery(percent: Int)
     case thermal(ThermalLevel)
-    case assertionFailure(StillOnError)
+    case assertionFailure(AwakeError)
     case appTerminating
 }
 
@@ -30,7 +30,7 @@ public enum ArmState: Equatable, Sendable {
     case armed
     case blockedLowBattery(percent: Int)
     case blockedThermal(ThermalLevel)
-    case failed(StillOnError)
+    case failed(AwakeError)
 
     public var isArmed: Bool { self == .armed }
 }
@@ -75,6 +75,8 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
     public var hotkey: HotkeyCombo
     public var batteryGuardEnabled: Bool
     public var thermalGuardEnabled: Bool
+    /// Animacion de parpado al cerrar y abrir la tapa.
+    public var animationsEnabled: Bool
 
     public static let batteryThresholdRange = 5...50
 
@@ -83,13 +85,15 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         thermalCeiling: ThermalLevel = .serious,
         hotkey: HotkeyCombo = .defaultCombo,
         batteryGuardEnabled: Bool = true,
-        thermalGuardEnabled: Bool = true
+        thermalGuardEnabled: Bool = true,
+        animationsEnabled: Bool = true
     ) {
         self.batteryThreshold = batteryThreshold
         self.thermalCeiling = thermalCeiling
         self.hotkey = hotkey
         self.batteryGuardEnabled = batteryGuardEnabled
         self.thermalGuardEnabled = thermalGuardEnabled
+        self.animationsEnabled = animationsEnabled
     }
 
     /// Corrige valores fuera de rango en vez de fallar: las preferencias vienen

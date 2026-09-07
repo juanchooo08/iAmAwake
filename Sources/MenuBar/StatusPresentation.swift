@@ -1,7 +1,7 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
-/// Textos legibles para los tipos de `StillOnCore`. Vive aca (y no en Core)
+/// Textos legibles para los tipos de `AwakeCore`. Vive aca (y no en Core)
 /// porque Core no conoce la capa de presentacion.
 public enum StatusText {
     public static func describe(_ level: ThermalLevel) -> String {
@@ -13,12 +13,12 @@ public enum StatusText {
         }
     }
 
-    public static func describe(_ error: StillOnError) -> String {
+    public static func describe(_ error: AwakeError) -> String {
         switch error {
         case .assertionFailed(let code):
             return "no se pudo crear la power assertion (codigo \(code))"
         case .helperUnavailable:
-            return "el daemon stillond no esta instalado o no responde"
+            return "el daemon iamawaked no esta instalado o no responde"
         case .helperRefused(let message):
             return "el daemon rechazo el pedido: \(message)"
         case .helperVersionMismatch(let expected, let got):
@@ -45,19 +45,23 @@ public struct StatusPresentation: Equatable, Sendable {
     public let toggleTitle: String
     /// Linea de estado (item deshabilitado) que describe la situacion actual.
     public let statusLine: String
+    /// Si el icono late. Solo late armado: es la senal de que esta trabajando.
+    public let pulses: Bool
 
     public init(
         symbolName: String,
         accessibilityDescription: String,
         tooltip: String,
         toggleTitle: String,
-        statusLine: String
+        statusLine: String,
+        pulses: Bool = false
     ) {
         self.symbolName = symbolName
         self.accessibilityDescription = accessibilityDescription
         self.tooltip = tooltip
         self.toggleTitle = toggleTitle
         self.statusLine = statusLine
+        self.pulses = pulses
     }
 
     public init(state: ArmState) {
@@ -77,7 +81,8 @@ public struct StatusPresentation: Equatable, Sendable {
                 accessibilityDescription: "Armado — la Mac no dormirá",
                 tooltip: "Armado — la Mac no dormirá",
                 toggleTitle: "Desarmar",
-                statusLine: "Armado — la Mac no dormirá"
+                statusLine: "Armado — la Mac no dormirá",
+                pulses: true
             )
 
         case .blockedLowBattery(let percent):

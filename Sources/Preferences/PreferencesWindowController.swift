@@ -1,5 +1,5 @@
 import AppKit
-import StillOnCore
+import AwakeCore
 import SwiftUI
 
 /// Ventana de preferencias. Lee y escribe unicamente via `PreferencesStoring`.
@@ -14,9 +14,9 @@ public final class PreferencesWindowController: NSWindowController {
 
         let hosting = NSHostingController(rootView: PreferencesView(viewModel: viewModel))
         let window = NSWindow(contentViewController: hosting)
-        window.title = "Preferencias de StillOn"
+        window.title = "Preferencias de iAmAwake"
         window.styleMask = [.titled, .closable, .miniaturizable]
-        window.setContentSize(NSSize(width: 420, height: 340))
+        window.setContentSize(NSSize(width: 420, height: 440))
         window.isReleasedWhenClosed = false
         window.center()
 
@@ -68,7 +68,18 @@ struct PreferencesView: View {
                     }
                 }
                 .disabled(!viewModel.thermalGuardEnabled)
-                Text("A partir de este nivel StillOn se desarma. Con la tapa cerrada el calor no se disipa.")
+                Text("A partir de este nivel iAmAwake se desarma. Con la tapa cerrada el calor no se disipa.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Animación") {
+                Toggle("Animar el párpado al cerrar y abrir la tapa", isOn: $viewModel.animationsEnabled)
+                Text("""
+                    Al cerrar casi no se alcanza a ver: la pantalla se apaga a los \
+                    0,2 s de que el sistema se entera. La que se ve es la de abrir, \
+                    que te dice cuánto aguantó.
+                    """)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

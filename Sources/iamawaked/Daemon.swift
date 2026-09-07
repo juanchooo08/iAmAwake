@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 import HelperClient   // DeadManTimer: un solo fuente compartido con el cliente
-import StillOnCore
+import AwakeCore
 import os
 
 /// Daemon root. Lo unico que realmente evita que la Mac duerma con la tapa
@@ -25,7 +25,7 @@ final class Daemon: @unchecked Sendable {
         case hardBatteryFloor = "piso duro de bateria"
     }
 
-    static let logger = Logger(subsystem: "dev.local.stillon", category: "stillond")
+    static let logger = Logger(subsystem: "dev.local.iamawake", category: "iamawaked")
 
     /// Cada cuanto mira el reloj el watchdog.
     static let watchdogInterval: TimeInterval = 1.0
@@ -65,7 +65,7 @@ final class Daemon: @unchecked Sendable {
     // MARK: - Ciclo de vida
 
     func run() -> Never {
-        Self.logger.notice("stillond arrancando (uid autorizado: \(self.uidDescription, privacy: .public))")
+        Self.logger.notice("iamawaked arrancando (uid autorizado: \(self.uidDescription, privacy: .public))")
 
         // Si un crash anterior dejo disablesleep=1, esto lo limpia. Arrancar
         // asumiendo un estado desconocido es como no tener dead man's switch.
@@ -100,7 +100,7 @@ final class Daemon: @unchecked Sendable {
         lock.unlock()
 
         listener?.closeAndUnlink()
-        Self.logger.notice("stillond terminando")
+        Self.logger.notice("iamawaked terminando")
         exit(0)
     }
 
@@ -109,7 +109,7 @@ final class Daemon: @unchecked Sendable {
     /// si se puede llamar a `pmset` (un handler de señal de verdad no podria).
     private func installSignalHandlers() {
         signal(SIGPIPE, SIG_IGN)
-        let queue = DispatchQueue(label: "dev.local.stillon.signals")
+        let queue = DispatchQueue(label: "dev.local.iamawake.signals")
         for number in [SIGTERM, SIGINT] {
             signal(number, SIG_IGN)
             let source = DispatchSource.makeSignalSource(signal: number, queue: queue)
@@ -122,7 +122,7 @@ final class Daemon: @unchecked Sendable {
     /// Vigila el silencio de la app y el piso de bateria. Corre en su propia cola:
     /// el hilo principal esta bloqueado en `accept()` y no puede mirar el reloj.
     private func startWatchdog() {
-        let queue = DispatchQueue(label: "dev.local.stillon.watchdog")
+        let queue = DispatchQueue(label: "dev.local.iamawake.watchdog")
         let timer = DispatchSource.makeTimerSource(queue: queue)
         timer.schedule(deadline: .now() + Self.watchdogInterval, repeating: Self.watchdogInterval)
         let ticks = TickCounter()

@@ -2,7 +2,7 @@ import Darwin
 import Foundation
 
 /// Errores de transporte. No cruzan la frontera del modulo: `SocketLidController`
-/// los traduce a `StillOnError`.
+/// los traduce a `AwakeError`.
 enum SocketError: Error, Equatable {
     /// No se pudo abrir/conectar el socket (no existe, permisos, backlog lleno).
     case cannotConnect(Int32)

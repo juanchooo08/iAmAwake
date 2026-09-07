@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Formateo local de `HotkeyCombo` ("⌃⌥S").
 ///

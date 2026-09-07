@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 public final class PowerState: ObservableObject {
     @Published public private(set) var status: ArmState = .disarmed
-    @Published public private(set) var lastError: StillOnError?
+    @Published public private(set) var lastError: AwakeError?
 
     private let inhibitor: SleepInhibiting
     private let lid: LidSleepControlling
@@ -49,7 +49,7 @@ public final class PowerState: ObservableObject {
 
         do {
             try await inhibitor.engage()
-        } catch let error as StillOnError {
+        } catch let error as AwakeError {
             await fail(error)
             return
         } catch {
@@ -62,7 +62,7 @@ public final class PowerState: ObservableObject {
         do {
             try await lid.setClamshellSleepDisabled(true)
             lastError = nil
-        } catch let error as StillOnError {
+        } catch let error as AwakeError {
             lastError = error
             await notifier.notifyFailure(error)
         } catch {
@@ -115,7 +115,7 @@ public final class PowerState: ObservableObject {
         do {
             try await lid.heartbeat()
             if lastError == .helperUnavailable { lastError = nil }
-        } catch let error as StillOnError {
+        } catch let error as AwakeError {
             lastError = error
             await notifier.notifyFailure(error)
         } catch {
@@ -159,7 +159,7 @@ public final class PowerState: ObservableObject {
         }
     }
 
-    private func fail(_ error: StillOnError) async {
+    private func fail(_ error: AwakeError) async {
         await inhibitor.disengage()
         try? await lid.setClamshellSleepDisabled(false)
         status = .failed(error)

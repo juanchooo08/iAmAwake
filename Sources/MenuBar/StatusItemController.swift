@@ -1,5 +1,6 @@
 import AppKit
-import StillOnCore
+import AwakeCore
+import QuartzCore
 
 /// Implementacion de `StatusPresenting` sobre `NSStatusItem`.
 ///
@@ -87,6 +88,28 @@ public final class StatusItemController: NSObject, StatusPresenting {
 
         toggleItem.title = next.toggleTitle
         statusLineItem.title = next.statusLine
+        syncPulse(next.pulses)
+    }
+
+    /// Latido lento del icono mientras esta armado. Es el unico feedback que se
+    /// ve sin cerrar la tapa ni abrir el menu.
+    private func syncPulse(_ pulses: Bool) {
+        guard let button = statusItem.button else { return }
+        button.wantsLayer = true
+        guard let layer = button.layer else { return }
+
+        layer.removeAnimation(forKey: "pulse")
+        // Respeta "Reducir movimiento" del sistema: ahi el icono se queda quieto.
+        guard pulses, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return }
+
+        let pulse = CABasicAnimation(keyPath: "opacity")
+        pulse.fromValue = 1.0
+        pulse.toValue = 0.4
+        pulse.duration = 1.1
+        pulse.autoreverses = true
+        pulse.repeatCount = .infinity
+        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        layer.add(pulse, forKey: "pulse")
     }
 
     @objc private func handleToggle() { onToggle?() }

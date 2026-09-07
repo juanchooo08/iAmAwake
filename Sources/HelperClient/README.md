@@ -1,12 +1,12 @@
 # HelperClient
 
-Cliente del daemon root `stillond`. Implementa `LidSleepControlling`
+Cliente del daemon root `iamawaked`. Implementa `LidSleepControlling`
 (`SocketLidController`) hablando JSON delimitado por `\n` sobre un socket Unix.
 
 ## Que asume
 
 - Que el daemon existe y habla `Wire` v1. Si no, lo dice; no adivina.
-- Que el plist del LaunchDaemon en `/Library/LaunchDaemons/dev.local.stillond.plist`
+- Que el plist del LaunchDaemon en `/Library/LaunchDaemons/dev.local.iamawaked.plist`
   es la señal de "instalado". Su ausencia ⇒ `.notInstalled` sin siquiera intentar
   conectar.
 - Que la app manda `heartbeat()` cada `Wire.heartbeatInterval` (10 s) mientras
@@ -47,10 +47,10 @@ peor caso recibe `helperUnavailable` y desarma.
 
 | Situacion | Error |
 |---|---|
-| Socket ausente, caido o timeout | `StillOnError.helperUnavailable` |
-| Respuesta `ok:false` | `StillOnError.helperRefused(mensaje)` |
-| `version` distinta de `Wire.protocolVersion` | `StillOnError.helperVersionMismatch` |
-| Respuesta truncada o basura | `StillOnError.helperUnavailable` |
+| Socket ausente, caido o timeout | `AwakeError.helperUnavailable` |
+| Respuesta `ok:false` | `AwakeError.helperRefused(mensaje)` |
+| `version` distinta de `Wire.protocolVersion` | `AwakeError.helperVersionMismatch` |
+| Respuesta truncada o basura | `AwakeError.helperUnavailable` |
 
 `installState` es la excepcion: si el daemon contesta con otra version devuelve
 `.ready(protocolVersion:)` con la version real. Decidir que hacer con la
@@ -68,7 +68,7 @@ lo use el daemon, precisamente para poder testearla sin I/O: se le inyecta un
 `ClockProviding` falso (`MutableClock`) y se avanza el tiempo a mano. Cero
 esperas reales.
 
-> `Sources/stillond/DeadManTimer.swift` es un **symlink** a este archivo. Los dos
+> `Sources/iamawaked/DeadManTimer.swift` es un **symlink** a este archivo. Los dos
 > targets lo compilan; el fuente y los tests viven aca. Se hizo asi porque
-> `stillond` no depende de `HelperClient` en `Package.swift` y ese archivo es de
+> `iamawaked` no depende de `HelperClient` en `Package.swift` y ese archivo es de
 > otro modulo.

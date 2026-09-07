@@ -1,6 +1,6 @@
 import Foundation
 import IOKit.ps
-import StillOnCore
+import AwakeCore
 
 /// Lector real de `IOPowerSources`.
 ///

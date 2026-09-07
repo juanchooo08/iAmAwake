@@ -66,5 +66,5 @@ public protocol PreferencesStoring: AnyObject, Sendable {
 public protocol Notifying: AnyObject, Sendable {
     func requestAuthorizationIfNeeded() async
     func notifyDisarmed(reason: DisarmReason) async
-    func notifyFailure(_ error: StillOnError) async
+    func notifyFailure(_ error: AwakeError) async
 }

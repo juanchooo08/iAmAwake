@@ -1,7 +1,7 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
-/// Cliente del daemon root `stillond`. Es la unica via real para evitar que la
+/// Cliente del daemon root `iamawaked`. Es la unica via real para evitar que la
 /// Mac duerma al cerrar la tapa (ver ARCHITECTURE.md seccion 0).
 ///
 /// # Modelo
@@ -56,7 +56,7 @@ public final class SocketLidController: LidSleepControlling, @unchecked Sendable
         self.plistPath = plistPath
         self.timeout = timeout
         self.fileManager = fileManager
-        self.queue = DispatchQueue(label: "dev.local.stillon.helper-client")
+        self.queue = DispatchQueue(label: "dev.local.iamawake.helper-client")
     }
 
     // MARK: - LidSleepControlling
@@ -138,11 +138,11 @@ public final class SocketLidController: LidSleepControlling, @unchecked Sendable
             throw SocketError.truncated
         }
         guard response.version == Wire.protocolVersion else {
-            throw StillOnError.helperVersionMismatch(
+            throw AwakeError.helperVersionMismatch(
                 expected: Wire.protocolVersion, got: response.version)
         }
         guard response.ok else {
-            throw StillOnError.helperRefused(response.error ?? "el daemon rechazo la operacion")
+            throw AwakeError.helperRefused(response.error ?? "el daemon rechazo la operacion")
         }
         return response
     }
@@ -159,11 +159,11 @@ public final class SocketLidController: LidSleepControlling, @unchecked Sendable
         do {
             let response = try roundTripOnQueue(.ping)
             return .ready(protocolVersion: response.version)
-        } catch StillOnError.helperVersionMismatch(_, let got) {
+        } catch AwakeError.helperVersionMismatch(_, let got) {
             // Responde, pero con otra version. Sigue estando "listo": quien decide
             // que hacer con la incompatibilidad es PowerState, no el transporte.
             return .ready(protocolVersion: got)
-        } catch StillOnError.helperRefused {
+        } catch AwakeError.helperRefused {
             // Contesta y habla nuestro protocolo: esta corriendo.
             return .ready(protocolVersion: Wire.protocolVersion)
         } catch {
@@ -176,7 +176,7 @@ public final class SocketLidController: LidSleepControlling, @unchecked Sendable
     /// Los errores de transporte no le sirven a la app: solo hay dos preguntas
     /// utiles, "¿esta el daemon?" y "¿que dijo?".
     private static func translate(_ error: Error) -> Error {
-        if error is StillOnError { return error }
-        return StillOnError.helperUnavailable
+        if error is AwakeError { return error }
+        return AwakeError.helperUnavailable
     }
 }

@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Mock de `PowerSourceReading`. Los tests de guards NUNCA tocan IOKit.
 final class MockPowerSource: PowerSourceReading, @unchecked Sendable {

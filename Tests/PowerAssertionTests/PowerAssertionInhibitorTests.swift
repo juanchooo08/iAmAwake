@@ -1,6 +1,6 @@
 import Foundation
 import IOKit.pwr_mgt
-import StillOnCore
+import AwakeCore
 import Testing
 
 @testable import PowerAssertion
@@ -139,7 +139,7 @@ struct PowerAssertionInhibitorTests {
             spawner: MockProcessSpawner(shouldFail: true)
         )
 
-        await #expect(throws: StillOnError.assertionFailed(mockFailure)) {
+        await #expect(throws: AwakeError.assertionFailed(mockFailure)) {
             try await inhibitor.engage()
         }
         #expect(inhibitor.isEngaged == false)
@@ -153,7 +153,7 @@ struct PowerAssertionInhibitorTests {
             spawner: MockProcessSpawner(shouldFail: true)
         )
 
-        await #expect(throws: StillOnError.self) { try await inhibitor.engage() }
+        await #expect(throws: AwakeError.self) { try await inhibitor.engage() }
         try await inhibitor.engage()
 
         #expect(inhibitor.isEngaged == true)

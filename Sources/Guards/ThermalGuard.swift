@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Desarma cuando el nivel termico alcanza el techo configurado.
 ///

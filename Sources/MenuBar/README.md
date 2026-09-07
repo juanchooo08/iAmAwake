@@ -1,6 +1,6 @@
 # MenuBar
 
-Implementa `StatusPresenting` (`StillOnCore`) con un `NSStatusItem`.
+Implementa `StatusPresenting` (`AwakeCore`) con un `NSStatusItem`.
 
 ## Piezas
 
@@ -9,7 +9,7 @@ Implementa `StatusPresenting` (`StillOnCore`) con un `NSStatusItem`.
   `toggleTitle` / `statusLine`. Toda la logica de presentacion vive aca.
 - `StatusItemController` — `@MainActor`, envuelve `NSStatusItem` y el `NSMenu`.
   Solo traduce `StatusPresentation` a AppKit.
-- `StatusText` — textos legibles para `ThermalLevel` y `StillOnError`.
+- `StatusText` — textos legibles para `ThermalLevel` y `AwakeError`.
 
 ## Los cinco estados
 

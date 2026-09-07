@@ -4,11 +4,13 @@ import Foundation
 import Guards
 import HelperClient
 import Hotkey
+import LidObserver
 import MenuBar
 import Notifier
+import Overlay
 import PowerAssertion
 import Preferences
-import StillOnCore
+import AwakeCore
 
 /// Unico lugar del proyecto que conoce implementaciones concretas.
 ///
@@ -35,6 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let hotkeys: CarbonHotkeyRegistrar
     private let guardList: [Guarding]
     private let powerState: PowerState
+    private let lidObserver: LidObserver
+    private let overlay: EyelidOverlayController
 
     /// Se crea en `applicationDidFinishLaunching`: `NSStatusBar.system` no tiene
     /// sentido antes de que la app exista.
@@ -47,6 +51,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var heartbeatTimer: Timer?
     private var preferencesWindow: PreferencesWindowController?
     private var registeredHotkey: HotkeyCombo?
+
+    /// Cuenta cuanto estuvo cerrada la tapa. Ver `LidSessionTracker`.
+    private let lidSessions = LidSessionTracker()
 
     /// Tope para el desarme sincrono de `applicationWillTerminate`.
     private static let terminationTimeout: TimeInterval = 2.0
@@ -71,6 +78,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.lid = lid
         self.hotkeys = CarbonHotkeyRegistrar()
         self.guardList = guards
+        self.lidObserver = LidObserver(source: IORegistryClamshellSource())
+        self.overlay = EyelidOverlayController()
         self.powerState = PowerState(
             inhibitor: inhibitor,
             lid: lid,
@@ -91,6 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         wireMenu(presenter)
         observeStatus(presenter)
         startGuards()
+        observeLid()
         observePreferences()
         registerHotkey(preferencesStore.snapshot.hotkey)
 
@@ -132,6 +142,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         preferencesTask = nil
         statusSubscription = nil
         hotkeys.unregister()
+        lidObserver.stopMonitoring()
+        overlay.dismiss()
         for guardImpl in guardList { guardImpl.stop() }
 
         guard powerState.status.isArmed || inhibitor.isEngaged else { return }
@@ -174,6 +186,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// La tapa no decide nada: solo dispara la animacion. Si esto fallara, iAmAwake
+    /// sigue manteniendo la Mac despierta igual — es decoracion, no mecanismo.
+    ///
+    /// El callback llega por el dispatch queue main (lo fija
+    /// `IORegistryClamshellSource`), asi que se puede entrar al MainActor sin
+    /// saltar de turno: en el cierre cada milisegundo cuenta, el backlight se
+    /// apaga a los ~0.2 s.
+    private func observeLid() {
+        lidObserver.startMonitoring { [weak self] state in
+            MainActor.assumeIsolated { self?.handleLid(state) }
+        }
+    }
+
+    private func handleLid(_ state: LidState) {
+        // El tracker se actualiza siempre, aunque las animaciones esten apagadas:
+        // si no, prenderlas a mitad de una tapa cerrada daria una duracion falsa.
+        let transition = lidSessions.transition(to: state, armed: powerState.status.isArmed)
+        guard preferencesStore.snapshot.animationsEnabled else { return }
+        overlay.play(transition)
+    }
+
     private func startGuards() {
         let state = powerState
         for guardImpl in guardList {
@@ -207,7 +240,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 Task { @MainActor in await state.toggle() }
             }
             registeredHotkey = combo
-        } catch let error as StillOnError {
+        } catch let error as AwakeError {
             registeredHotkey = nil
             Task { [notifier] in await notifier.notifyFailure(error) }
         } catch {
@@ -263,8 +296,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func warnHelperMissing() async {
         await notificationCenter.deliver(
             NotificationPayload(
-                identifier: "dev.local.stillon.helper-missing",
-                title: "StillOn: falta el componente con privilegios",
+                identifier: "dev.local.iamawake.helper-missing",
+                title: "iAmAwake: falta el componente con privilegios",
                 body: """
                 Sin él, cerrar la tapa duerme la Mac igual. Las demás protecciones \
                 (pantalla e inactividad) siguen funcionando. Para instalarlo, corré \

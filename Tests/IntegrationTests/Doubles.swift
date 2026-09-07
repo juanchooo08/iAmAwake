@@ -1,6 +1,6 @@
 import Foundation
 import Notifier
-import StillOnCore
+import AwakeCore
 
 /// Bitacora ordenada de efectos observables. Es lo que permite verificar el
 /// ORDEN de las llamadas y no solo que ocurrieron: revertir el interruptor de
@@ -59,9 +59,9 @@ final class SpyInhibitor: SleepInhibiting, @unchecked Sendable {
     private let lock = NSLock()
     private let log: CallLog
     private var _engaged = false
-    private var _failure: StillOnError?
+    private var _failure: AwakeError?
 
-    init(log: CallLog, failure: StillOnError? = nil) {
+    init(log: CallLog, failure: AwakeError? = nil) {
         self.log = log
         self._failure = failure
     }
@@ -72,7 +72,7 @@ final class SpyInhibitor: SleepInhibiting, @unchecked Sendable {
         return _engaged
     }
 
-    func setFailure(_ error: StillOnError?) {
+    func setFailure(_ error: AwakeError?) {
         lock.lock()
         _failure = error
         lock.unlock()
@@ -80,7 +80,7 @@ final class SpyInhibitor: SleepInhibiting, @unchecked Sendable {
 
     // Los cuerpos con lock viven en metodos sincronos: Swift 6 prohibe
     // NSLock.lock() dentro de una funcion async.
-    private func markEngaged() -> StillOnError? {
+    private func markEngaged() -> AwakeError? {
         lock.lock()
         defer { lock.unlock() }
         if _failure == nil { _engaged = true }
@@ -111,13 +111,13 @@ final class SpyLid: LidSleepControlling, @unchecked Sendable {
     private let log: CallLog
     private var _clamshellSleepDisabled = false
     private var _installState: HelperInstallState
-    private var _failure: StillOnError?
+    private var _failure: AwakeError?
     private var _heartbeats = 0
 
     init(
         log: CallLog,
         installState: HelperInstallState = .ready(protocolVersion: Wire.protocolVersion),
-        failure: StillOnError? = nil
+        failure: AwakeError? = nil
     ) {
         self.log = log
         self._installState = installState
@@ -146,13 +146,13 @@ final class SpyLid: LidSleepControlling, @unchecked Sendable {
         return _heartbeats
     }
 
-    func setFailure(_ error: StillOnError?) {
+    func setFailure(_ error: AwakeError?) {
         lock.lock()
         _failure = error
         lock.unlock()
     }
 
-    private func applyClamshell(_ disabled: Bool) -> StillOnError? {
+    private func applyClamshell(_ disabled: Bool) -> AwakeError? {
         lock.lock()
         defer { lock.unlock() }
         if _failure == nil { _clamshellSleepDisabled = disabled }
@@ -164,7 +164,7 @@ final class SpyLid: LidSleepControlling, @unchecked Sendable {
         if let failure = applyClamshell(disabled) { throw failure }
     }
 
-    private func countHeartbeat() -> StillOnError? {
+    private func countHeartbeat() -> AwakeError? {
         lock.lock()
         defer { lock.unlock() }
         if _failure == nil { _heartbeats += 1 }

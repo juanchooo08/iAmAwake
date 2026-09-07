@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Persistencia de `PreferencesSnapshot` en `UserDefaults`.
 ///
@@ -8,7 +8,7 @@ import StillOnCore
 /// abajo el snapshot entero.
 public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked Sendable {
 
-    public static let suiteName = "dev.local.stillon"
+    public static let suiteName = "dev.local.iamawake"
 
     enum Key {
         static let batteryThreshold = "batteryThreshold"

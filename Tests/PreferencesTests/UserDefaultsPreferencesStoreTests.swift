@@ -1,11 +1,11 @@
-import StillOnCore
+import AwakeCore
 import Foundation
 import Testing
 
 @testable import Preferences
 
 /// Cada test corre sobre una suite de `UserDefaults` efimera con nombre unico.
-/// Nunca se toca `dev.local.stillon`, la suite real del usuario.
+/// Nunca se toca `dev.local.iamawake`, la suite real del usuario.
 @Suite final class UserDefaultsPreferencesStoreTests {
 
     /// Una suite por test: cada uno estrena su propia suite de UserDefaults y la
@@ -14,7 +14,7 @@ import Testing
     private let defaults: UserDefaults
 
     init() {
-        suiteName = "test.stillon.\(UUID().uuidString)"
+        suiteName = "test.iamawake.\(UUID().uuidString)"
         defaults = UserDefaults(suiteName: suiteName)!
     }
 

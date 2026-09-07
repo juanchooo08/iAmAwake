@@ -1,6 +1,6 @@
 # PowerAssertion
 
-Implementa `SleepInhibiting` (StillOnCore). Evita el sueño **por inactividad**:
+Implementa `SleepInhibiting` (AwakeCore). Evita el sueño **por inactividad**:
 pantalla e idle del sistema.
 
 ## Que hace
@@ -27,7 +27,7 @@ maquina **durmio a los 22 segundos** con `NoDisplaySleep` +
 
 El clamshell sleep lo decide `IOPMrootDomain` por otra via
 (`DisableClamshellSleep`, que exige root). Eso es responsabilidad de
-`LidSleepControlling` — el daemon `stillond`. Las dos capas se arman juntas; este
+`LidSleepControlling` — el daemon `iamawaked`. Las dos capas se arman juntas; este
 modulo por si solo cubre display + idle y nada mas.
 
 No agregues una cuarta assertion esperando arreglarlo. Ya se probo.
@@ -39,7 +39,7 @@ en `disengage()`. `isUsingFallback` expone si la inhibicion activa viene del
 fallback, para que la UI pueda avisar que se esta en modo degradado.
 
 Solo si el fallback **tambien** falla se lanza
-`StillOnError.assertionFailed(kern_return_t)`, con el `kern_return_t` de la
+`AwakeError.assertionFailed(kern_return_t)`, con el `kern_return_t` de la
 llamada IOKit que fallo primero. Nunca se falla en silencio.
 
 ## Como se testea

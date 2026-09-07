@@ -3,7 +3,7 @@ import Foundation
 import Testing
 
 @testable import Hotkey
-import StillOnCore
+import AwakeCore
 
 /// Doble de prueba de la frontera Carbon. Nunca toca el sistema real.
 private final class MockCarbonAPI: CarbonHotkeyAPI {
@@ -65,7 +65,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         api.registerStatus = OSStatus(eventHotKeyExistsErr)
         let sut = CarbonHotkeyRegistrar(api: api)
 
-        #expect(throws: StillOnError.hotkeyRegistrationFailed(OSStatus(eventHotKeyExistsErr))) {
+        #expect(throws: AwakeError.hotkeyRegistrationFailed(OSStatus(eventHotKeyExistsErr))) {
             try sut.register(.defaultCombo) {}
         }
         #expect(api.liveTokenIDs.isEmpty)
@@ -76,7 +76,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         api.installStatus = OSStatus(-50)
         let sut = CarbonHotkeyRegistrar(api: api)
 
-        #expect(throws: StillOnError.hotkeyRegistrationFailed(-50)) {
+        #expect(throws: AwakeError.hotkeyRegistrationFailed(-50)) {
             try sut.register(.defaultCombo) {}
         }
         #expect(api.registeredIDs.isEmpty, "no debe registrar si el handler fallo")
@@ -89,7 +89,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         try sut.register(.defaultCombo) { fired += 1 }
 
         api.registerStatus = OSStatus(eventHotKeyExistsErr)
-        #expect(throws: StillOnError.self) {
+        #expect(throws: AwakeError.self) {
             try sut.register(HotkeyCombo(keyCode: 2, modifiers: 0)) {}
         }
 

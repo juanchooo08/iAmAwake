@@ -1,19 +1,19 @@
-# stillond
+# iamawaked
 
 Daemon root. Es lo **unico** que realmente evita que la Mac duerma con la tapa
 cerrada, y lo unico del proyecto que puede dejarte la bateria en 0 si se porta
 mal. Lee ARCHITECTURE.md seccion 0 antes de tocarlo.
 
 ```
-stillond --uid <uid autorizado> [--socket <ruta>]
+iamawaked --uid <uid autorizado> [--socket <ruta>]
 ```
 
 Se instala con `Scripts/install-helper.sh` (una vez, con `sudo`) y lo levanta
-launchd desde `/Library/LaunchDaemons/dev.local.stillond.plist`.
+launchd desde `/Library/LaunchDaemons/dev.local.iamawaked.plist`.
 
 ## Que hace
 
-Escucha en `/var/run/stillond.sock` (JSON delimitado por `\n`, tipos `Wire`) y
+Escucha en `/var/run/iamawaked.sock` (JSON delimitado por `\n`, tipos `Wire`) y
 atiende cuatro comandos:
 
 | Comando | Efecto |
@@ -55,7 +55,7 @@ Ademas, **al arrancar fuerza `disablesleep 0`**: si un crash anterior lo dejo en
 Cada reversion automatica se loggea con su causa:
 
 ```
-log stream --predicate 'subsystem == "dev.local.stillon"'
+log stream --predicate 'subsystem == "dev.local.iamawake"'
 ```
 
 ## Que NO maneja
@@ -81,7 +81,7 @@ Corre como root, asi que el punto importante es **quien puede darle ordenes**:
    contra el autorizado (root tambien pasa) y se corta la conexion si no coincide,
    con un log.
 
-El uid autorizado **no esta hardcodeado**: llega por `--uid` (o `STILLOND_UID`)
+El uid autorizado **no esta hardcodeado**: llega por `--uid` (o `IAMAWAKED_UID`)
 desde el plist, que `install-helper.sh` escribe con `$SUDO_UID`.
 
 Superficie de ataque: el protocolo es un enum cerrado de cuatro comandos sin
@@ -98,10 +98,10 @@ parte donde un bug se paga con la bateria en 0, es la decision temporal:
 `DeadManTimer`, con un reloj inyectado y tiempo simulado, en
 `Tests/HelperClientTests/DeadManTimerTests.swift`.
 
-`Sources/stillond/DeadManTimer.swift` es un **symlink** a
+`Sources/iamawaked/DeadManTimer.swift` es un **symlink** a
 `Sources/HelperClient/DeadManTimer.swift`: el fuente y sus tests viven en
 `HelperClient` (que si tiene test target), y este target lo compila tambien.
-`stillond` no depende de `HelperClient` en `Package.swift`, y ese contrato no se
+`iamawaked` no depende de `HelperClient` en `Package.swift`, y ese contrato no se
 toco.
 
 Verificacion manual del daemon, sobre una maquina que puedas dejar despierta:
@@ -110,7 +110,7 @@ Verificacion manual del daemon, sobre una maquina que puedas dejar despierta:
 sudo ./Scripts/install-helper.sh
 pmset -g | grep -i disablesleep     # 0
 # armar desde la app, o a mano con nc:
-printf '{"cmd":"arm","version":1}\n' | nc -U /var/run/stillond.sock
+printf '{"cmd":"arm","version":1}\n' | nc -U /var/run/iamawaked.sock
 pmset -g | grep -i disablesleep     # 1
 # al cortar el nc, la conexion se cierra y vuelve a 0 en el acto (causa 2).
 # Si en cambio el cliente queda abierto pero callado, vuelve a 0 a los 30 s (causa 1).

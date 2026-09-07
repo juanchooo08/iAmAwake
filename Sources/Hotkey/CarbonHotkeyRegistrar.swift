@@ -1,12 +1,12 @@
 import Carbon.HIToolbox
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// `HotkeyRegistering` sobre Carbon.
 ///
 /// - Registrar dos veces desregistra la combinacion anterior primero.
 /// - Si Carbon rechaza el registro (combinacion tomada por otra app) lanza
-///   `StillOnError.hotkeyRegistrationFailed(OSStatus)`. Nunca falla en silencio.
+///   `AwakeError.hotkeyRegistrationFailed(OSStatus)`. Nunca falla en silencio.
 public final class CarbonHotkeyRegistrar: HotkeyRegistering {
     private let api: CarbonHotkeyAPI
     private var token: HotkeyToken?
@@ -34,7 +34,7 @@ public final class CarbonHotkeyRegistrar: HotkeyRegistering {
                 self?.fire(firedID)
             }
             guard status == noErr else {
-                throw StillOnError.hotkeyRegistrationFailed(status)
+                throw AwakeError.hotkeyRegistrationFailed(status)
             }
             handlerInstalled = true
         }
@@ -44,7 +44,7 @@ public final class CarbonHotkeyRegistrar: HotkeyRegistering {
 
         let result = api.register(keyCode: combo.keyCode, modifiers: combo.modifiers, id: id)
         guard result.status == noErr, let newToken = result.token else {
-            throw StillOnError.hotkeyRegistrationFailed(result.status)
+            throw AwakeError.hotkeyRegistrationFailed(result.status)
         }
         token = newToken
         self.action = action

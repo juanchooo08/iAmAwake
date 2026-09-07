@@ -3,7 +3,7 @@
 Persistencia de las preferencias y su ventana de configuración.
 
 - `UserDefaultsPreferencesStore` — implementa `PreferencesStoring`. Suite
-  `dev.local.stillon`. El `UserDefaults` se inyecta por `init`.
+  `dev.local.iamawake`. El `UserDefaults` se inyecta por `init`.
 - `PreferencesWindowController` / `PreferencesViewModel` — ventana SwiftUI:
   umbral de batería, techo térmico, toggles de cada guarda, captura de hotkey.
 - `HotkeyDisplay` — formatea un `HotkeyCombo` como "⌃⌥S".
@@ -25,7 +25,7 @@ Persistencia de las preferencias y su ventana de configuración.
 - No sincroniza entre máquinas (nada de iCloud). Es local a propósito: sin red.
 - `HotkeyDisplay` duplica el formateador público de `Hotkey`. Es deliberado: el
   contrato prohíbe que `Preferences` dependa de `Hotkey`. Si molesta, la salida
-  limpia es mover el formateador a `StillOnCore`, no cruzar los módulos.
+  limpia es mover el formateador a `AwakeCore`, no cruzar los módulos.
 
 ## Cómo se testea
 

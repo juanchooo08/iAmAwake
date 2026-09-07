@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 import Testing
 
 @testable import HelperClient

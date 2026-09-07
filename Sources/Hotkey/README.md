@@ -1,6 +1,6 @@
 # Hotkey
 
-Implementa `HotkeyRegistering` (`StillOnCore`) con Carbon.
+Implementa `HotkeyRegistering` (`AwakeCore`) con Carbon.
 
 ## Piezas
 
@@ -18,7 +18,7 @@ un atajo global fijo, Carbon alcanza y evita pedirle permisos al usuario.
 ## Contrato
 
 - `register(_:action:)` desregistra lo anterior **primero**, instala el handler
-  de eventos una sola vez, y lanza `StillOnError.hotkeyRegistrationFailed(OSStatus)`
+  de eventos una sola vez, y lanza `AwakeError.hotkeyRegistrationFailed(OSStatus)`
   si Carbon rechaza el registro (tipico: `eventHotKeyExistsErr`, la combinacion
   ya la tomo otra app). Nunca falla en silencio.
 - `unregister()` es idempotente.

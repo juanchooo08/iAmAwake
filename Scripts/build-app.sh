@@ -1,5 +1,5 @@
 #!/bin/bash
-# Compila StillOn.app y lo firma ad-hoc (sin cuenta de desarrollador de Apple).
+# Compila iAmAwake.app y lo firma ad-hoc (sin cuenta de desarrollador de Apple).
 #
 # Por que hace falta un .app y no alcanza el binario suelto: UNUserNotifications
 # exige un bundle con identificador, y NSStatusItem necesita una app con
@@ -7,7 +7,7 @@
 set -euo pipefail
 
 PKG="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP="$PKG/build/StillOn.app"
+APP="$PKG/build/iAmAwake.app"
 VERSION="1.0.0"
 
 echo "==> Compilando en release"
@@ -17,17 +17,17 @@ BIN="$(swift build --package-path "$PKG" -c release --show-bin-path)"
 echo "==> Armando el bundle"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN/StillOn" "$APP/Contents/MacOS/StillOn"
+cp "$BIN/iAmAwake" "$APP/Contents/MacOS/iAmAwake"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleName</key><string>StillOn</string>
-    <key>CFBundleDisplayName</key><string>StillOn</string>
-    <key>CFBundleIdentifier</key><string>dev.local.stillon</string>
-    <key>CFBundleExecutable</key><string>StillOn</string>
+    <key>CFBundleName</key><string>iAmAwake</string>
+    <key>CFBundleDisplayName</key><string>iAmAwake</string>
+    <key>CFBundleIdentifier</key><string>dev.local.iamawake</string>
+    <key>CFBundleExecutable</key><string>iAmAwake</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>$VERSION</string>
     <key>CFBundleVersion</key><string>$VERSION</string>
@@ -53,5 +53,5 @@ echo "Listo: $APP"
 echo
 echo "Para instalarlo:"
 echo "    cp -R \"$APP\" /Applications/"
-echo "    xattr -cr /Applications/StillOn.app"
-echo "    open /Applications/StillOn.app"
+echo "    xattr -cr /Applications/iAmAwake.app"
+echo "    open /Applications/iAmAwake.app"

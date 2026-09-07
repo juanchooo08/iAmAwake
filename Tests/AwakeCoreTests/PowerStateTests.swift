@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import StillOnCore
+@testable import AwakeCore
 
 @Suite("PowerState — maquina de estados")
 @MainActor

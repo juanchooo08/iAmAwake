@@ -1,11 +1,11 @@
 import Foundation
-@testable import StillOnCore
+@testable import AwakeCore
 
 final class MockInhibitor: SleepInhibiting, @unchecked Sendable {
     var isEngaged = false
     var engageCount = 0
     var disengageCount = 0
-    var errorToThrow: StillOnError?
+    var errorToThrow: AwakeError?
 
     func engage() async throws {
         engageCount += 1
@@ -21,8 +21,8 @@ final class MockInhibitor: SleepInhibiting, @unchecked Sendable {
 final class MockLid: LidSleepControlling, @unchecked Sendable {
     var disabledCalls: [Bool] = []
     var heartbeatCount = 0
-    var errorToThrow: StillOnError?
-    var heartbeatError: StillOnError?
+    var errorToThrow: AwakeError?
+    var heartbeatError: AwakeError?
     var state: HelperInstallState = .ready(protocolVersion: Wire.protocolVersion)
 
     var installState: HelperInstallState { get async { state } }
@@ -65,12 +65,12 @@ final class MockPreferences: PreferencesStoring, @unchecked Sendable {
 
 final class MockNotifier: Notifying, @unchecked Sendable {
     var disarmReasons: [DisarmReason] = []
-    var failures: [StillOnError] = []
+    var failures: [AwakeError] = []
     var authRequested = false
 
     func requestAuthorizationIfNeeded() async { authRequested = true }
     func notifyDisarmed(reason: DisarmReason) async { disarmReasons.append(reason) }
-    func notifyFailure(_ error: StillOnError) async { failures.append(error) }
+    func notifyFailure(_ error: AwakeError) async { failures.append(error) }
 }
 
 struct FixedClock: ClockProviding {

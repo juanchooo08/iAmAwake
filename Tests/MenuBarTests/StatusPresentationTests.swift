@@ -2,7 +2,7 @@ import Foundation
 import Testing
 
 @testable import MenuBar
-import StillOnCore
+import AwakeCore
 
 @Suite struct StatusPresentationTests {
     private static let allStates: [ArmState] = [
@@ -107,7 +107,7 @@ import StillOnCore
     }
 
     @Test func testErrorDescriptionsAreAllDistinct() {
-        let errors: [StillOnError] = [
+        let errors: [AwakeError] = [
             .assertionFailed(1),
             .helperUnavailable,
             .helperRefused("boom"),
@@ -123,5 +123,26 @@ import StillOnCore
     @Test func testThermalLevelDescriptionsAreAllDistinct() {
         let levels: [ThermalLevel] = [.nominal, .fair, .serious, .critical]
         #expect(Set(levels.map { StatusText.describe($0) }).count == 4)
+    }
+}
+
+@Suite("StatusPresentation — latido del icono")
+struct StatusPresentationPulseTests {
+    @Test func soloLateArmado() {
+        #expect(StatusPresentation(state: .armed).pulses)
+    }
+
+    @Test func ningunOtroEstadoLate() {
+        // Un icono que late bloqueado o en error sugiere que esta trabajando
+        // cuando justamente no lo esta.
+        let quietos: [ArmState] = [
+            .disarmed,
+            .blockedLowBattery(percent: 12),
+            .blockedThermal(.critical),
+            .failed(.helperUnavailable),
+        ]
+        for state in quietos {
+            #expect(!StatusPresentation(state: state).pulses, "\(state) no deberia latir")
+        }
     }
 }

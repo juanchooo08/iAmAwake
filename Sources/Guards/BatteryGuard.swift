@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Desarma cuando la bateria cae al umbral configurado.
 ///

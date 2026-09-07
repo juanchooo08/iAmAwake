@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Lector real de temperatura, basado en `ProcessInfo.processInfo.thermalState`.
 ///

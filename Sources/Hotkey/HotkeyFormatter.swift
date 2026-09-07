@@ -1,6 +1,6 @@
 import Carbon.HIToolbox
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Convierte un `HotkeyCombo` a texto legible ("⌃⌥S").
 /// Publico a proposito: lo consume la UI de preferencias.

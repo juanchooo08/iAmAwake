@@ -1,16 +1,16 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Decision pura del dead man's switch: "¿paso demasiado tiempo sin señales de
 /// vida de la app?".
 ///
 /// No hace I/O, no crea timers, no toca `pmset`. Solo acumula el instante de la
-/// ultima actividad y responde si ya vencio. El daemon (`stillond`) es quien la
+/// ultima actividad y responde si ya vencio. El daemon (`iamawaked`) es quien la
 /// consulta periodicamente y actua; asi la logica temporal se testea con un
 /// reloj falso y sin esperas reales.
 ///
 /// Este archivo se compila en dos targets: `HelperClient` (donde vive el fuente
-/// y los tests) y `stillond` (que lo usa de verdad). Ver los README de ambos.
+/// y los tests) y `iamawaked` (que lo usa de verdad). Ver los README de ambos.
 public final class DeadManTimer: @unchecked Sendable {
 
     public enum State: Equatable, Sendable {

@@ -1,5 +1,5 @@
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Estado mutable compartido por `BatteryGuard` y `ThermalGuard`.
 ///

@@ -1,6 +1,6 @@
 import AppKit
 import Foundation
-import StillOnCore
+import AwakeCore
 
 /// Puente entre la ventana SwiftUI y `PreferencesStoring`.
 /// No conoce `PowerState` ni ningun otro modulo.
@@ -18,6 +18,9 @@ public final class PreferencesViewModel: ObservableObject {
     }
     @Published public var thermalGuardEnabled: Bool {
         didSet { let v = thermalGuardEnabled; push { $0.thermalGuardEnabled = v } }
+    }
+    @Published public var animationsEnabled: Bool {
+        didSet { let v = animationsEnabled; push { $0.animationsEnabled = v } }
     }
     @Published public private(set) var hotkey: HotkeyCombo
     @Published public private(set) var isCapturingHotkey = false
@@ -39,6 +42,7 @@ public final class PreferencesViewModel: ObservableObject {
         self.thermalCeiling = snapshot.thermalCeiling
         self.batteryGuardEnabled = snapshot.batteryGuardEnabled
         self.thermalGuardEnabled = snapshot.thermalGuardEnabled
+        self.animationsEnabled = snapshot.animationsEnabled
         self.hotkey = snapshot.hotkey
 
         let changes = store.changes
@@ -114,6 +118,7 @@ public final class PreferencesViewModel: ObservableObject {
         if thermalCeiling != snapshot.thermalCeiling { thermalCeiling = snapshot.thermalCeiling }
         if batteryGuardEnabled != snapshot.batteryGuardEnabled { batteryGuardEnabled = snapshot.batteryGuardEnabled }
         if thermalGuardEnabled != snapshot.thermalGuardEnabled { thermalGuardEnabled = snapshot.thermalGuardEnabled }
+        if animationsEnabled != snapshot.animationsEnabled { animationsEnabled = snapshot.animationsEnabled }
         if hotkey != snapshot.hotkey { hotkey = snapshot.hotkey }
         applyingRemoteChange = false
     }

@@ -5,7 +5,7 @@
 // tests se activan solos sin romper nada mientras tanto.
 #if canImport(Notifier)
 
-    import StillOnCore
+    import AwakeCore
     import Foundation
 import Testing
 
@@ -62,7 +62,7 @@ import Testing
             await notifier.notifyDisarmed(reason: .lowBattery(percent: 12))
 
             #expect(spy.delivered.count == 1)
-            #expect(spy.delivered[0].body == "StillOn se desarmó — batería en 12%. Tu Mac va a poder dormir para no quedarse sin carga.")
+            #expect(spy.delivered[0].body == "iAmAwake se desarmó — batería en 12%. Tu Mac va a poder dormir para no quedarse sin carga.")
         }
 
         @Test func testThermalExplainsWhy() async {
@@ -70,7 +70,7 @@ import Testing
             let notifier = UserNotificationsNotifier(center: spy)
             await notifier.notifyDisarmed(reason: .thermal(.critical))
 
-            #expect(spy.delivered[0].body == "StillOn se desarmó — temperatura alta (crítica). Con la tapa cerrada el calor no se disipa.")
+            #expect(spy.delivered[0].body == "iAmAwake se desarmó — temperatura alta (crítica). Con la tapa cerrada el calor no se disipa.")
         }
 
         @Test func testAssertionFailureDescribesTheConcreteError() async {
@@ -79,8 +79,8 @@ import Testing
             await notifier.notifyDisarmed(reason: .assertionFailure(.helperUnavailable))
 
             let body = spy.delivered[0].body
-            #expect(body.hasPrefix("StillOn se desarmó — "))
-            #expect(body.contains("stillond"))
+            #expect(body.hasPrefix("iAmAwake se desarmó — "))
+            #expect(body.contains("iamawaked"))
             #expect(body.contains("cierre de tapa"))
         }
 
@@ -98,7 +98,7 @@ import Testing
         // MARK: - Errores
 
         @Test func testEveryErrorProducesADistinctNonEmptyMessage() async {
-            let errors: [StillOnError] = [
+            let errors: [AwakeError] = [
                 .assertionFailed(-536_870_207),
                 .helperUnavailable,
                 .helperRefused("socket cerrado"),

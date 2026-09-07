@@ -1,6 +1,6 @@
 import Foundation
 import IOKit.pwr_mgt
-import StillOnCore
+import AwakeCore
 
 /// Impide el sueño por inactividad creando dos power assertions de IOKit:
 /// `NoDisplaySleep` (pantalla) y `PreventUserIdleSystemSleep` (sistema por idle).
@@ -22,7 +22,7 @@ import StillOnCore
 ///
 /// Si IOKit falla, se intenta `/usr/bin/caffeinate -dis` como proceso hijo, que se
 /// mata en `disengage()`. Solo si el fallback tambien falla se lanza
-/// `StillOnError.assertionFailed`.
+/// `AwakeError.assertionFailed`.
 public final class PowerAssertionInhibitor: SleepInhibiting, @unchecked Sendable {
 
     /// Los tipos de assertion que se crean, en orden.
@@ -31,7 +31,7 @@ public final class PowerAssertionInhibitor: SleepInhibiting, @unchecked Sendable
         kIOPMAssertionTypePreventUserIdleSystemSleep,
     ]
 
-    static let assertionName = "StillOn: keeping this Mac awake"
+    static let assertionName = "iAmAwake: keeping this Mac awake"
     static let caffeinatePath = "/usr/bin/caffeinate"
     static let caffeinateArguments = ["-dis"]
 
@@ -117,7 +117,7 @@ public final class PowerAssertionInhibitor: SleepInhibiting, @unchecked Sendable
             )
         } catch {
             fallbackProcess = nil
-            throw StillOnError.assertionFailed(status)
+            throw AwakeError.assertionFailed(status)
         }
     }
 }
