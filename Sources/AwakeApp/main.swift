@@ -32,7 +32,7 @@ if let index = CommandLine.arguments.firstIndex(of: "--demo-overlay") {
 
 @MainActor
 final class DemoDelegate: NSObject, NSApplicationDelegate {
-    private let overlay = EyelidOverlayController()
+    private let overlay = CurtainOverlayController()
     private let transition: LidTransition
 
     init(transition: LidTransition) {

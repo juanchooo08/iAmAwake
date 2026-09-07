@@ -38,7 +38,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let guardList: [Guarding]
     private let powerState: PowerState
     private let lidObserver: LidObserver
-    private let overlay: EyelidOverlayController
+    private let overlay: CurtainOverlayController
 
     /// Se crea en `applicationDidFinishLaunching`: `NSStatusBar.system` no tiene
     /// sentido antes de que la app exista.
@@ -79,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.hotkeys = CarbonHotkeyRegistrar()
         self.guardList = guards
         self.lidObserver = LidObserver(source: IORegistryClamshellSource())
-        self.overlay = EyelidOverlayController()
+        self.overlay = CurtainOverlayController()
         self.powerState = PowerState(
             inhibitor: inhibitor,
             lid: lid,

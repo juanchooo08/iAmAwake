@@ -381,8 +381,10 @@ apagándose. Ninguna animación puede anticiparla.
 - `LidSessionTracker` — cuenta cuánto estuvo cerrada. Está separado del
   `AppDelegate` porque tiene un caso borde que se rompe fácil: si se limpia
   `closedAt` antes de leerlo, la duración se pierde siempre. Eso se testea.
-- `EyelidOverlayController` — el AppKit. `NSWindow` borderless a nivel
-  `.screenSaver`, `ignoresMouseEvents`, se va sola. Honra «Reducir movimiento».
+- `CurtainOverlayController` — el AppKit. Una sola capa que se traslada: baja
+  desde arriba al cerrar, se levanta al abrir. El texto es capa hija, así que
+  viaja con la cortina. `NSWindow` borderless a nivel `.screenSaver`,
+  `ignoresMouseEvents`, se va sola. Honra «Reducir movimiento».
 
 `PowerState` **no conoce nada de esto**. La animación es decoración: si fallara
 entera, iAmAwake mantiene la Mac despierta igual. El `AppDelegate` la cablea

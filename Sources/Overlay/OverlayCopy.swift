@@ -20,9 +20,9 @@ public enum AwakeTally {
 /// abrir una ventana.
 public struct OverlayCopy: Equatable, Sendable {
     public enum Motion: Equatable, Sendable {
-        /// Los parpados barren hacia el centro y se frenan. El ojo queda abierto.
+        /// La cortina baja desde arriba y tapa la pantalla.
         case closing
-        /// Los parpados se retiran y aparece el resumen.
+        /// La cortina se levanta: la pantalla se destapa de abajo hacia arriba.
         case opening
     }
 

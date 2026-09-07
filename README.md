@@ -56,12 +56,14 @@ Clic en el ícono o ⌃⌥S (configurable) para armar y desarmar.
 Armado, el ícono **late** despacio. Es el único feedback que se ve sin abrir el
 menú. Respeta «Reducir movimiento» del sistema: con eso activado se queda quieto.
 
-### La animación del párpado
+### La cortina
 
-Al cerrar y al abrir la tapa se dibuja un párpado que intenta cerrarse y se
-frena: el ojo queda abierto. Solo aparece **si estás armado** — es la prueba de
-que iAmAwake está haciendo algo, y con la app desarmada no estaría haciendo nada.
-Al abrir te dice cuánto aguantó (`47 min con la tapa cerrada`).
+Al cerrar la tapa baja una cortina desde arriba y tapa la pantalla. Al abrirla la
+cortina se levanta, así que la pantalla se destapa de abajo hacia arriba; antes
+de levantarse se queda un momento con el resumen (`47 min con la tapa cerrada`).
+
+Solo aparece **si estás armado** — es la prueba de que iAmAwake está haciendo
+algo, y con la app desarmada no estaría haciendo nada.
 
 Para verla sin cerrar la tapa:
 
@@ -109,12 +111,12 @@ Además fuerza `disablesleep 0` al arrancar, por si quedó colgado de un crash.
    registrarla. Si otra app la tiene tomada, falla ahí y te avisa.
 8. **`Preferences` duplica el formateador de hotkey** de `Hotkey`, porque el
    contrato prohíbe la dependencia cruzada. Cosmético.
-9. **La animación de cierre casi no se ve, y no tiene arreglo.** macOS reporta la
+9. **La bajada de la cortina casi no se ve, y no tiene arreglo.** macOS reporta la
    tapa con un booleano (`AppleClamshellState`) que cambia recién a ~5° del
    cierre, y el backlight se apaga a los ~0,2 s. El sensor de ángulo que daría
    una animación progresiva existe solo en los MacBook Pro 2021+, que lo publican
    por HID en la usage page 0x20; verificado con `ioreg` en este MacBookAir10,1:
-   cero dispositivos ahí. La animación que se ve de verdad es la de apertura.
+   cero dispositivos ahí. La que se ve de verdad es la de apertura.
 10. **La animación dibuja solo en `NSScreen.main`.** Con monitores externos, las
    otras pantallas no muestran nada.
 
