@@ -54,3 +54,21 @@ No hace falta drenar nada: movés el umbral en vez del nivel.
 
 Para la guarda térmica no hay equivalente limpio sin calentar la máquina de
 verdad; el nivel lo dicta el sistema. La cobertura ahí es por tests con mock.
+
+
+## NetworkGuard (agregado después de v1)
+
+Desarma cuando la red lleva caída más que `networkGraceSeconds`.
+
+Cuenta el margen con un `DelayScheduling` inyectado, no con un `Timer` propio:
+así los cinco minutos se testean sin esperarlos. Dos casos borde que están
+cubiertos por tests porque son fáciles de romper:
+
+- **Reportes repetidos de caída no reinician la cuenta.** `NWPathMonitor` puede
+  repetir `unsatisfied` al cambiar de interfaz; si cada uno regalara un margen
+  entero, no vencería nunca.
+- **Bajar el margen con la red ya caída desarma sin esperar.** Pasar de 15 a 1
+  minuto con 5 minutos caídos tiene que actuar ya, no arrancar otra cuenta.
+
+**NO maneja:** distinguir "hay ruta" de "internet responde". Ver la limitación 10
+del README.

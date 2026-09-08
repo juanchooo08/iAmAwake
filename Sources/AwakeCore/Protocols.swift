@@ -35,6 +35,21 @@ public protocol ThermalReading: AnyObject, Sendable {
     func stopMonitoring()
 }
 
+/// Solo dice si hay camino a internet, no si el camino sirve. Ver `NetworkGuard`.
+public protocol NetworkReachabilityReading: AnyObject, Sendable {
+    var isOnline: Bool { get }
+    func startMonitoring(onChange: @escaping @Sendable (Bool) -> Void)
+    func stopMonitoring()
+}
+
+/// Un temporizador cancelable. Existe para que el margen de la guarda de red se
+/// pueda testear sin esperar cinco minutos de reloj real.
+public protocol DelayScheduling: AnyObject, Sendable {
+    /// Reemplaza lo que hubiera pendiente.
+    func schedule(after seconds: TimeInterval, _ body: @escaping @Sendable () -> Void)
+    func cancelPending()
+}
+
 public protocol Guarding: AnyObject, Sendable {
     var identifier: GuardID { get }
     func start(onVerdict: @escaping @Sendable (GuardVerdict) -> Void)

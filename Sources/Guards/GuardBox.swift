@@ -34,6 +34,14 @@ final class GuardBox<Value: Sendable>: @unchecked Sendable {
     /// Evalua contra un valor recien leido de la fuente. Se usa cuando nadie
     /// llamo a `start()` todavia: sin esto el box informaria el valor con el que
     /// se construyo, y una guarda que dice `.ok` con la bateria al 1% no sirve.
+    /// Preferencias vigentes. `NetworkGuard` las necesita para recalcular su
+    /// margen cuando cambian.
+    var currentPrefs: PreferencesSnapshot {
+        lock.lock()
+        defer { lock.unlock() }
+        return prefs
+    }
+
     func verdict(for freshValue: Value) -> GuardVerdict {
         lock.lock()
         defer { lock.unlock() }

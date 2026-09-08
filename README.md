@@ -51,10 +51,22 @@ Clic en el ícono o ⌃⌥S (configurable) para armar y desarmar.
 | `bolt.fill` | Armado — la Mac no va a dormir |
 | `battery.25` | Desarmado solo por batería baja |
 | `thermometer.high` | Desarmado solo por temperatura |
+| `wifi.slash` | Desarmado solo por falta de conexión |
 | `exclamationmark.triangle` | Error — la app te dice cuál |
 
 Armado, el ícono **late** despacio. Es el único feedback que se ve sin abrir el
 menú. Respeta «Reducir movimiento» del sistema: con eso activado se queda quieto.
+
+### La guarda de red
+
+Si la conexión se cae y no vuelve dentro del margen (5 min por defecto,
+configurable de «al toque» a 30 min), iAmAwake se desarma solo y te avisa por
+qué. Con la tapa cerrada eso significa que la Mac se duerme: sin internet no hay
+descargas ni Claude Code que cuidar, así que no tiene sentido gastar batería.
+
+El margen existe para que un salto entre redes o un reconnect de WiFi no te
+corte la sesión. Como todas las guardas, **no rearma sola** cuando vuelve el
+internet: quedás desarmado hasta que decidas.
 
 ### La cortina
 
@@ -117,7 +129,11 @@ Además fuerza `disablesleep 0` al arrancar, por si quedó colgado de un crash.
    una animación progresiva existe solo en los MacBook Pro 2021+, que lo publican
    por HID en la usage page 0x20; verificado con `ioreg` en este MacBookAir10,1:
    cero dispositivos ahí. La que se ve de verdad es la de apertura.
-10. **La animación dibuja solo en `NSScreen.main`.** Con monitores externos, las
+10. **La guarda de red mira el camino, no internet.** Usa `NWPathMonitor`, que
+   dice si hay ruta a la red. Un WiFi de hotel con portal cautivo, o un router
+   sin salida, cuentan como conectado. Distinguirlo pediría pegarle a un
+   servidor, y el requisito de v1 es cero llamadas de red.
+11. **La animación dibuja solo en `NSScreen.main`.** Con monitores externos, las
    otras pantallas no muestran nada.
 
 ## Lo que falta (roadmap)

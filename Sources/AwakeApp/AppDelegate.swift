@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let guards: [Guarding] = [
             BatteryGuard(reader: IOPowerSourcesReader(), preferences: prefs),
             ThermalGuard(reader: ProcessInfoThermalReader(), preferences: prefs),
+            NetworkGuard(reader: NWPathReachabilityReader(), preferences: prefs),
         ]
 
         self.preferencesStore = store

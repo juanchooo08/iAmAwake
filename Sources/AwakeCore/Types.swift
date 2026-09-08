@@ -6,7 +6,7 @@ public enum ThermalLevel: Int, Comparable, Codable, Sendable {
     public static func < (a: ThermalLevel, b: ThermalLevel) -> Bool { a.rawValue < b.rawValue }
 }
 
-public enum GuardID: String, Codable, Sendable, CaseIterable { case battery, thermal }
+public enum GuardID: String, Codable, Sendable, CaseIterable { case battery, thermal, network }
 
 public enum AwakeError: Error, Equatable, Sendable {
     case assertionFailed(kern_return_t)
@@ -21,6 +21,9 @@ public enum DisarmReason: Equatable, Sendable {
     case user
     case lowBattery(percent: Int)
     case thermal(ThermalLevel)
+    /// Se cayo la red y no volvio dentro del margen. `afterSeconds` es el margen
+    /// que se agoto, no el tiempo total sin conexion.
+    case networkLost(afterSeconds: Int)
     case assertionFailure(AwakeError)
     case appTerminating
 }
@@ -30,6 +33,7 @@ public enum ArmState: Equatable, Sendable {
     case armed
     case blockedLowBattery(percent: Int)
     case blockedThermal(ThermalLevel)
+    case blockedNetworkLost(afterSeconds: Int)
     case failed(AwakeError)
 
     public var isArmed: Bool { self == .armed }
@@ -75,10 +79,17 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
     public var hotkey: HotkeyCombo
     public var batteryGuardEnabled: Bool
     public var thermalGuardEnabled: Bool
+    /// Desarmar cuando se cae la red. Sin internet, lo que justificaba tener la
+    /// Mac despierta con la tapa cerrada (descargas, Claude Code) ya no corre.
+    public var networkGuardEnabled: Bool
+    /// Cuanto tiene que estar caida la red antes de desarmar. Un margen chico
+    /// desarma ante un salto de WiFi; uno grande gasta bateria al pedo.
+    public var networkGraceSeconds: Int
     /// Animacion de parpado al cerrar y abrir la tapa.
     public var animationsEnabled: Bool
 
     public static let batteryThresholdRange = 5...50
+    public static let networkGraceRange = 0...1800
 
     public init(
         batteryThreshold: Int = 20,
@@ -86,6 +97,8 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         hotkey: HotkeyCombo = .defaultCombo,
         batteryGuardEnabled: Bool = true,
         thermalGuardEnabled: Bool = true,
+        networkGuardEnabled: Bool = true,
+        networkGraceSeconds: Int = 300,
         animationsEnabled: Bool = true
     ) {
         self.batteryThreshold = batteryThreshold
@@ -93,6 +106,8 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         self.hotkey = hotkey
         self.batteryGuardEnabled = batteryGuardEnabled
         self.thermalGuardEnabled = thermalGuardEnabled
+        self.networkGuardEnabled = networkGuardEnabled
+        self.networkGraceSeconds = networkGraceSeconds
         self.animationsEnabled = animationsEnabled
     }
 
@@ -103,6 +118,8 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         c.batteryThreshold = min(max(batteryThreshold, Self.batteryThresholdRange.lowerBound),
                                  Self.batteryThresholdRange.upperBound)
         if c.thermalCeiling == .nominal { c.thermalCeiling = .fair }
+        c.networkGraceSeconds = min(max(networkGraceSeconds, Self.networkGraceRange.lowerBound),
+                                    Self.networkGraceRange.upperBound)
         return c
     }
 }

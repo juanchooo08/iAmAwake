@@ -19,6 +19,12 @@ public final class PreferencesViewModel: ObservableObject {
     @Published public var thermalGuardEnabled: Bool {
         didSet { let v = thermalGuardEnabled; push { $0.thermalGuardEnabled = v } }
     }
+    @Published public var networkGuardEnabled: Bool {
+        didSet { let v = networkGuardEnabled; push { $0.networkGuardEnabled = v } }
+    }
+    @Published public var networkGraceSeconds: Int {
+        didSet { let v = networkGraceSeconds; push { $0.networkGraceSeconds = v } }
+    }
     @Published public var animationsEnabled: Bool {
         didSet { let v = animationsEnabled; push { $0.animationsEnabled = v } }
     }
@@ -27,6 +33,17 @@ public final class PreferencesViewModel: ObservableObject {
 
     /// Techos ofrecidos en la UI. `.nominal` queda fuera a proposito: dispararia siempre.
     public static let selectableCeilings: [ThermalLevel] = [.fair, .serious, .critical]
+
+    /// Margenes ofrecidos en la UI, en segundos.
+    public static let selectableGraces = [0, 60, 300, 900, 1800]
+
+    public static func graceLabel(_ seconds: Int) -> String {
+        switch seconds {
+        case 0: return "Al toque"
+        case ..<3600: return "\(seconds / 60) min"
+        default: return "\(seconds / 3600) h"
+        }
+    }
 
     public var hotkeyDisplayString: String { HotkeyDisplay.string(for: hotkey) }
 
@@ -42,6 +59,8 @@ public final class PreferencesViewModel: ObservableObject {
         self.thermalCeiling = snapshot.thermalCeiling
         self.batteryGuardEnabled = snapshot.batteryGuardEnabled
         self.thermalGuardEnabled = snapshot.thermalGuardEnabled
+        self.networkGuardEnabled = snapshot.networkGuardEnabled
+        self.networkGraceSeconds = snapshot.networkGraceSeconds
         self.animationsEnabled = snapshot.animationsEnabled
         self.hotkey = snapshot.hotkey
 
@@ -118,6 +137,8 @@ public final class PreferencesViewModel: ObservableObject {
         if thermalCeiling != snapshot.thermalCeiling { thermalCeiling = snapshot.thermalCeiling }
         if batteryGuardEnabled != snapshot.batteryGuardEnabled { batteryGuardEnabled = snapshot.batteryGuardEnabled }
         if thermalGuardEnabled != snapshot.thermalGuardEnabled { thermalGuardEnabled = snapshot.thermalGuardEnabled }
+        if networkGuardEnabled != snapshot.networkGuardEnabled { networkGuardEnabled = snapshot.networkGuardEnabled }
+        if networkGraceSeconds != snapshot.networkGraceSeconds { networkGraceSeconds = snapshot.networkGraceSeconds }
         if animationsEnabled != snapshot.animationsEnabled { animationsEnabled = snapshot.animationsEnabled }
         if hotkey != snapshot.hotkey { hotkey = snapshot.hotkey }
         applyingRemoteChange = false

@@ -103,6 +103,16 @@ public struct StatusPresentation: Equatable, Sendable {
                 statusLine: "Bloqueado por temperatura \(StatusText.describe(level))"
             )
 
+        case .blockedNetworkLost(let seconds):
+            let span = seconds >= 60 ? "\(seconds / 60) min" : "\(seconds) s"
+            self.init(
+                symbolName: "wifi.slash",
+                accessibilityDescription: "Desarmado por falta de conexión",
+                tooltip: "Desarmado: \(span) sin conexión",
+                toggleTitle: "Armar",
+                statusLine: "Bloqueado — \(span) sin conexión"
+            )
+
         case .failed(let error):
             let detail = StatusText.describe(error)
             self.init(

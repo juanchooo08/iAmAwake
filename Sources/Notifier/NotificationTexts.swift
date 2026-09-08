@@ -29,6 +29,13 @@ public enum NotificationTexts {
                 body: "iAmAwake se desarmó — temperatura alta (\(name(of: level))). Con la tapa cerrada el calor no se disipa."
             )
 
+        case .networkLost(let seconds):
+            return NotificationPayload(
+                identifier: "disarm.networkLost",
+                title: disarmTitle,
+                body: "iAmAwake se desarmó — \(minutes(seconds)) sin conexión. Sin red no hay descargas ni Claude Code que cuidar, así que tu Mac va a poder dormir."
+            )
+
         case .assertionFailure(let error):
             return NotificationPayload(
                 identifier: "disarm.assertionFailure",
@@ -75,6 +82,11 @@ public enum NotificationTexts {
             return "Las notificaciones de iAmAwake están desactivadas, así que no vas a enterarte cuando se desarme solo. "
                 + "Podés habilitarlas en Ajustes del Sistema › Notificaciones › iAmAwake."
         }
+    }
+
+    /// "5 min" / "45 s". El margen se configura en segundos pero se lee en minutos.
+    static func minutes(_ seconds: Int) -> String {
+        seconds >= 60 ? "\(seconds / 60) min" : "\(seconds) s"
     }
 
     public static func name(of level: ThermalLevel) -> String {

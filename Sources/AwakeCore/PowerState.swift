@@ -81,7 +81,7 @@ public final class PowerState: ObservableObject {
         switch reason {
         case .user, .appTerminating:
             status = .disarmed
-        case .lowBattery, .thermal:
+        case .lowBattery, .thermal, .networkLost:
             status = blockedState(for: reason)
         case .assertionFailure(let e):
             status = .failed(e)
@@ -147,6 +147,7 @@ public final class PowerState: ObservableObject {
         switch reason {
         case .lowBattery(let p): return .blockedLowBattery(percent: p)
         case .thermal(let l): return .blockedThermal(l)
+        case .networkLost(let seconds): return .blockedNetworkLost(afterSeconds: seconds)
         case .assertionFailure(let e): return .failed(e)
         case .user, .appTerminating: return .disarmed
         }
@@ -154,7 +155,7 @@ public final class PowerState: ObservableObject {
 
     private func isBlocked(_ s: ArmState) -> Bool {
         switch s {
-        case .blockedLowBattery, .blockedThermal, .failed: return true
+        case .blockedLowBattery, .blockedThermal, .blockedNetworkLost, .failed: return true
         case .armed, .disarmed: return false
         }
     }

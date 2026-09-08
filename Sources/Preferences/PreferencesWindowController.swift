@@ -16,7 +16,7 @@ public final class PreferencesWindowController: NSWindowController {
         let window = NSWindow(contentViewController: hosting)
         window.title = "Preferencias de iAmAwake"
         window.styleMask = [.titled, .closable, .miniaturizable]
-        window.setContentSize(NSSize(width: 420, height: 440))
+        window.setContentSize(NSSize(width: 420, height: 560))
         window.isReleasedWhenClosed = false
         window.center()
 
@@ -69,6 +69,22 @@ struct PreferencesView: View {
                 }
                 .disabled(!viewModel.thermalGuardEnabled)
                 Text("A partir de este nivel iAmAwake se desarma. Con la tapa cerrada el calor no se disipa.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Guarda de red") {
+                Toggle("Desarmar cuando se caiga la conexión", isOn: $viewModel.networkGuardEnabled)
+                Picker("Esperar", selection: $viewModel.networkGraceSeconds) {
+                    ForEach(PreferencesViewModel.selectableGraces, id: \.self) { seconds in
+                        Text(PreferencesViewModel.graceLabel(seconds)).tag(seconds)
+                    }
+                }
+                .disabled(!viewModel.networkGuardEnabled)
+                Text("""
+                    Sin internet no hay descargas ni Claude Code que cuidar. La espera \\
+                    evita que un salto de WiFi te desarme la sesión.
+                    """)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
