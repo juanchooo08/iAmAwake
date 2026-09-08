@@ -170,7 +170,9 @@ import Testing
             await notifier.notifyDisarmed(reason: .lowBattery(percent: 3))
 
             #expect(spy.delivered.isEmpty)
-            #expect(spy.authorizationRequests == 1)
+            // Un "no" no se cachea: puede ser una carrera del arranque, asi que
+            // cada aviso vuelve a preguntar.
+            #expect(spy.authorizationRequests == 3)
         }
     }
 

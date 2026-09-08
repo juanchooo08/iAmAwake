@@ -3,13 +3,13 @@ import AwakeCore
 
 /// Implementacion de `Notifying` sobre `UNUserNotificationCenter`.
 ///
-/// La autorizacion se pide una sola vez y el resultado queda recordado. Si el
+/// La autorizacion se pide una sola vez si la conceden. Si el
 /// usuario la niega no se crashea: se registra y se sigue (iAmAwake funciona igual,
 /// solo que en silencio).
 public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
 
     private enum Authorization {
-        case unknown, granted, denied
+        case unknown, granted
     }
 
     private let center: NotificationDelivering
@@ -64,8 +64,6 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
         switch authorization {
         case .granted:
             return .resolved(true)
-        case .denied:
-            return .resolved(false)
         case .unknown:
             if let existing = inFlight { return .pending(existing) }
             let task = Task { [center] in await center.requestAuthorization() }
@@ -74,10 +72,19 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
         }
     }
 
+    /// Solo se recuerda el "si".
+    ///
+    /// Un "no" no siempre es el usuario negando: pedido muy temprano en el
+    /// arranque, el sistema puede contestar que no antes de terminar de
+    /// registrar la app. Cachearlo dejaba la app muda para el resto de la
+    /// sesion, que es exactamente el sintoma que aparecio: la notificacion de
+    /// prueba llegaba, las de armado y desarmado no. Si el usuario de verdad
+    /// nego el permiso, volver a preguntar contesta que no al instante y sin
+    /// molestarlo.
     private func finishAuthorization(_ granted: Bool) {
         lock.lock()
         defer { lock.unlock() }
-        authorization = granted ? .granted : .denied
+        authorization = granted ? .granted : .unknown
         inFlight = nil
     }
 

@@ -105,10 +105,26 @@ final class NotificationDiagnosticDelegate: NSObject, NSApplicationDelegate {
                 UNUserNotificationCenter.current().add(request) { error in
                     salida.append("envio de prueba: "
                         + (error.map { "FALLO -> \($0.localizedDescription)" } ?? "entregado al sistema"))
-                    let texto = salida.text
-                    FileHandle.standardError.write(Data(texto.utf8))
-                    try? texto.write(toFile: "/tmp/iamawake-notificaciones.txt", atomically: true, encoding: .utf8)
-                    DispatchQueue.main.async { NSApp.terminate(nil) }
+                    // Segunda parte: el camino real de la app, no el crudo.
+                    Task {
+                        let notifier = UserNotificationsNotifier(center: UNCenterAdapter())
+                        await notifier.requestAuthorizationIfNeeded()
+                        await notifier.notifyArmed()
+                        salida.append("notifyArmed    : llamado")
+                        await notifier.notifyDisarmed(reason: .user)
+                        salida.append("notifyDisarmed : llamado")
+
+                        try? await Task.sleep(for: .seconds(1))
+                        let entregadas = await UNUserNotificationCenter.current().deliveredNotifications()
+                        salida.append("en el centro   : "
+                            + entregadas.map { $0.request.identifier }.joined(separator: ", "))
+
+                        let texto = salida.text
+                        FileHandle.standardError.write(Data(texto.utf8))
+                        try? texto.write(toFile: "/tmp/iamawake-notificaciones.txt", atomically: true, encoding: .utf8)
+                        try? await Task.sleep(for: .seconds(2))
+                        await MainActor.run { NSApp.terminate(nil) }
+                    }
                 }
             }
         }
