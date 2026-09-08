@@ -1,18 +1,15 @@
 # Estado
 
-v1 verificada end-to-end (2026-09-07), mas el renombre a iAmAwake y la animacion
-de tapa.
+- 199 tests en 18 suites pasan; `swift build -c release` sin warnings.
+- Renombre StillOn -> iAmAwake completo. El proyecto vive en
+  `/Users/juancho/Documents/SAAS FAC/iAmAwake/iAmAwake`.
+- Daemon `dev.local.iamawaked` instalado y probado contra el socket real.
+- `/Applications/iAmAwake.app` instalada y corriendo.
+- Animacion: cortina (baja al cerrar, se levanta al abrir). Modulos
+  `LidObserver` + `Overlay`.
+- Cuarta guarda: red. Desarma tras 5 min sin conexion, configurable.
 
-- 187 tests en 17 suites pasan; `swift build -c release` sin warnings.
-- Daemon verificado: arm pone SleepDisabled=1, disarm lo devuelve, dead man's
-  switch revierte ~0.5 s despues de cortar la conexion.
-- Prueba fisica de tapa cerrada: PASO (sin cargador, 5 min).
-- Renombre StillOn -> iAmAwake completo: modulos `Awake*`, daemon `iamawaked`,
-  socket `/var/run/iamawaked.sock`, bundle `dev.local.iamawake`. El directorio
-  paso de `StillOnLocal` a `iAmAwake`.
-- Animacion de parpado: modulos `LidObserver` + `Overlay`.
-
-Pendiente del usuario (necesita sudo o hardware):
-- Correr `sudo Scripts/install-helper.sh` de nuevo: el daemon viejo
-  (`dev.local.stillond`) sigue instalado y el script lo limpia solo.
-- Reemplazar `/Applications/StillOn.app` por el bundle nuevo.
+Sin verificar contra hardware todavia:
+- La cortina en un cierre de tapa real (la de cierre casi no se ve por diseno
+  del hardware; ver limitacion 9 del README).
+- La guarda de red en una caida real de WiFi.
