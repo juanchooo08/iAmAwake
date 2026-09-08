@@ -139,6 +139,19 @@ import Testing
             #expect(body.contains("NO se cubre el cierre de tapa"))
         }
 
+        @Test func armadoYDesarmadoCompartenGrupoParaPisarseEnPantalla() {
+            let armado = NotificationTexts.armed
+            let desarmado = NotificationTexts.disarmed(.user)
+
+            #expect(armado.group == desarmado?.group)
+            // Siguen siendo avisos distintos: el grupo es solo para la pantalla.
+            #expect(armado.identifier != desarmado?.identifier)
+        }
+
+        @Test func unaFallaNoSePisaConElEstado() {
+            #expect(NotificationTexts.failure(.helperUnavailable).group != NotificationTexts.armed.group)
+        }
+
         @Test func testHelperRefusedIncludesTheDaemonMessage() {
             let body = NotificationTexts.failure(.helperRefused("permiso denegado")).body
             #expect(body.contains("permiso denegado"))

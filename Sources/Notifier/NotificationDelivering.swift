@@ -9,10 +9,18 @@ public struct NotificationPayload: Equatable, Sendable {
     public let title: String
     public let body: String
 
-    public init(identifier: String, title: String, body: String) {
+    /// Avisos que comparten grupo se reemplazan entre si en pantalla.
+    ///
+    /// Armar y desarmar comparten uno: si toggleas rapido, lo unico que importa
+    /// es el estado en el que quedaste. Sin esto cada toggle encola un aviso
+    /// nuevo, y una rafaga de toggles la termina descartando el sistema entera.
+    public let group: String
+
+    public init(identifier: String, title: String, body: String, group: String? = nil) {
         self.identifier = identifier
         self.title = title
         self.body = body
+        self.group = group ?? identifier
     }
 }
 
@@ -51,8 +59,14 @@ public final class UNCenterAdapter: NotificationDelivering, @unchecked Sendable 
         content.title = payload.title
         content.body = payload.body
         content.sound = .default
+        // Sin esto el aviso entra en la cola general y macOS lo muestra cuando
+        // le queda comodo, con varios segundos de demora. Armar y desarmar es
+        // una respuesta directa a una tecla que el usuario acaba de apretar:
+        // o se ve ahora o no sirve.
+        content.interruptionLevel = .timeSensitive
+        // Mismo identificador = el aviso nuevo reemplaza al viejo en pantalla.
         let request = UNNotificationRequest(
-            identifier: payload.identifier + "-" + UUID().uuidString,
+            identifier: payload.group,
             content: content,
             trigger: nil
         )

@@ -5,6 +5,10 @@ import AwakeCore
 /// `UNUserNotificationCenter`.
 public enum NotificationTexts {
 
+    /// Armado y desarmado son el mismo hecho contado dos veces: en que estado
+    /// quedo la app. Se pisan entre si en vez de encolarse.
+    public static let stateGroup = "estado"
+
     public static let disarmTitle = "iAmAwake se desarmó"
     public static let failureTitle = "iAmAwake tuvo un problema"
 
@@ -16,7 +20,8 @@ public enum NotificationTexts {
             return NotificationPayload(
                 identifier: "disarm.user",
                 title: "iAmAwake desarmado",
-                body: "Tu Mac vuelve a dormirse normalmente cuando cierres la tapa."
+                body: "Tu Mac vuelve a dormirse normalmente cuando cierres la tapa.",
+                group: NotificationTexts.stateGroup
             )
 
         // Salir de la app no es una novedad para nadie: la cerraste vos.
@@ -57,7 +62,8 @@ public enum NotificationTexts {
         NotificationPayload(
             identifier: "arm.ok",
             title: "iAmAwake armado",
-            body: "Podés cerrar la tapa: tu Mac se queda despierta."
+            body: "Podés cerrar la tapa: tu Mac se queda despierta.",
+            group: NotificationTexts.stateGroup
         )
     }
 
