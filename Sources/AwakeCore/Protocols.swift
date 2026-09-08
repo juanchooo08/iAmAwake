@@ -80,6 +80,9 @@ public protocol PreferencesStoring: AnyObject, Sendable {
 
 public protocol Notifying: AnyObject, Sendable {
     func requestAuthorizationIfNeeded() async
+    /// Solo cuando el armado quedo completo. Si la tapa fallo, el usuario recibe
+    /// `notifyFailure` y no dos notificaciones seguidas.
+    func notifyArmed() async
     func notifyDisarmed(reason: DisarmReason) async
     func notifyFailure(_ error: AwakeError) async
 }

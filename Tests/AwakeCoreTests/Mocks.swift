@@ -65,10 +65,12 @@ final class MockPreferences: PreferencesStoring, @unchecked Sendable {
 
 final class MockNotifier: Notifying, @unchecked Sendable {
     var disarmReasons: [DisarmReason] = []
+    var armedCount = 0
     var failures: [AwakeError] = []
     var authRequested = false
 
     func requestAuthorizationIfNeeded() async { authRequested = true }
+    func notifyArmed() async { armedCount += 1 }
     func notifyDisarmed(reason: DisarmReason) async { disarmReasons.append(reason) }
     func notifyFailure(_ error: AwakeError) async { failures.append(error) }
 }

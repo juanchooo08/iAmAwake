@@ -57,6 +57,20 @@ Clic en el ícono o ⌃⌥S (configurable) para armar y desarmar.
 Armado, el ícono **late** despacio. Es el único feedback que se ve sin abrir el
 menú. Respeta «Reducir movimiento» del sistema: con eso activado se queda quieto.
 
+### Notificaciones
+
+| Cuándo | Qué dice |
+|---|---|
+| Armás | «Podés cerrar la tapa: tu Mac se queda despierta» |
+| Desarmás vos | «Tu Mac vuelve a dormirse normalmente cuando cierres la tapa» |
+| Se desarma solo | El motivo: batería, temperatura o red |
+| Falla algo | Qué falló, nunca en silencio |
+
+Dos casos **no** notifican a propósito: salir de la app (la cerraste vos), y
+armar cuando el daemon no está — ahí llega el aviso de la falla en vez del de
+armado, para no darte dos notificaciones seguidas ni decirte que está todo bien
+cuando el cierre de tapa no está cubierto.
+
 ### La guarda de red
 
 Si la conexión se cae y no vuelve dentro del margen (5 min por defecto,

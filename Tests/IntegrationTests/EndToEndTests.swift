@@ -16,8 +16,8 @@ struct EndToEndTests {
         await h.tapMenuToggle()
 
         #expect(h.state.status == .armed)
-        #expect(h.log.all == [Effect.engage, Effect.lidOn],
-                "primero las assertions, despues el interruptor de tapa")
+        #expect(h.log.all == [Effect.engage, Effect.lidOn, Effect.notify("arm.ok")],
+                "primero las assertions, despues el interruptor de tapa, y recien ahi el aviso")
         #expect(h.presenter.last == .armed)
     }
 
@@ -42,8 +42,9 @@ struct EndToEndTests {
         await h.tapMenuToggle()
 
         #expect(h.state.status == .disarmed)
-        #expect(h.log.all == [Effect.disengage, Effect.lidOff])
-        #expect(h.deliverer.payloads.isEmpty, "lo desarmo el usuario, no hay que avisarle")
+        #expect(h.log.all == [Effect.disengage, Effect.lidOff, Effect.notify("disarm.user")],
+                "revertir primero, avisar despues")
+        #expect(h.deliverer.payloads.map(\.identifier) == ["arm.ok", "disarm.user"])
     }
 
     // MARK: - El flujo que motiva el proyecto
@@ -176,7 +177,8 @@ struct EndToEndTests {
 
         #expect(h.log.all == [Effect.disengage, Effect.lidOff],
                 "si la app se va con disablesleep=1, la bateria se drena a 0 con la tapa cerrada")
-        #expect(h.deliverer.payloads.isEmpty)
+        #expect(h.deliverer.payloads.map(\.identifier) == ["arm.ok"],
+                "salir de la app no notifica; el 'arm.ok' es del armado previo")
     }
 
     // MARK: - Preferencias

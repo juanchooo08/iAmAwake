@@ -140,13 +140,31 @@ struct PowerStateTests {
 
     // MARK: - Desarme manual
 
-    @Test func testDesarmeManual_noNotifica() async {
+    @Test func testDesarmeManual_notifica() async {
         let r = makeRig()
         await r.state.requestArm()
         await r.state.requestDisarm(reason: .user)
 
         #expect(r.state.status == .disarmed)
-        #expect(r.notifier.disarmReasons.isEmpty, "el usuario ya sabe que lo desarmo el")
+        #expect(r.notifier.disarmReasons == [.user])
+    }
+
+    @Test func testArmarNotificaUnaSolaVez() async {
+        let r = makeRig()
+        await r.state.requestArm()
+        #expect(r.notifier.armedCount == 1)
+
+        // Armar estando armado no vuelve a avisar.
+        await r.state.requestArm()
+        #expect(r.notifier.armedCount == 1)
+    }
+
+    @Test func testArmadoBloqueadoNoNotificaArmado() async {
+        // Si una guarda lo frena nunca llego a armarse: avisar "armado" seria mentira.
+        let r = makeRig(battery: .mustNotArm(.lowBattery(percent: 8)))
+        await r.state.requestArm()
+
+        #expect(r.notifier.armedCount == 0)
     }
 
     @Test func testToggle() async {

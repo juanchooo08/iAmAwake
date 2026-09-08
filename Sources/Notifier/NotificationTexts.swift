@@ -12,7 +12,15 @@ public enum NotificationTexts {
     ///   `.user` y `.appTerminating` son acciones del propio usuario: ya lo sabe.
     public static func disarmed(_ reason: DisarmReason) -> NotificationPayload? {
         switch reason {
-        case .user, .appTerminating:
+        case .user:
+            return NotificationPayload(
+                identifier: "disarm.user",
+                title: "iAmAwake desarmado",
+                body: "Tu Mac vuelve a dormirse normalmente cuando cierres la tapa."
+            )
+
+        // Salir de la app no es una novedad para nadie: la cerraste vos.
+        case .appTerminating:
             return nil
 
         case .lowBattery(let percent):
@@ -43,6 +51,14 @@ public enum NotificationTexts {
                 body: "iAmAwake se desarmó — \(describe(error))"
             )
         }
+    }
+
+    public static var armed: NotificationPayload {
+        NotificationPayload(
+            identifier: "arm.ok",
+            title: "iAmAwake armado",
+            body: "Podés cerrar la tapa: tu Mac se queda despierta."
+        )
     }
 
     public static func failure(_ error: AwakeError) -> NotificationPayload {

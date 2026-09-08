@@ -84,15 +84,31 @@ import Testing
             #expect(body.contains("cierre de tapa"))
         }
 
-        @Test func testUserAndTerminatingDoNotNotify() async {
+        @Test func testTerminatingDoesNotNotify() async {
+            // Salir de la app no es novedad: la cerraste vos.
             let spy = SpyNotificationCenter()
             let notifier = UserNotificationsNotifier(center: spy)
-            await notifier.notifyDisarmed(reason: .user)
             await notifier.notifyDisarmed(reason: .appTerminating)
 
             #expect(spy.delivered.isEmpty)
             // Ni siquiera se molesta al usuario pidiendo permiso.
             #expect(spy.authorizationRequests == 0)
+        }
+
+        @Test func testUserDisarmNotifies() async {
+            let spy = SpyNotificationCenter()
+            let notifier = UserNotificationsNotifier(center: spy)
+            await notifier.notifyDisarmed(reason: .user)
+
+            #expect(spy.delivered.map(\.identifier) == ["disarm.user"])
+        }
+
+        @Test func testArmedNotifies() async {
+            let spy = SpyNotificationCenter()
+            let notifier = UserNotificationsNotifier(center: spy)
+            await notifier.notifyArmed()
+
+            #expect(spy.delivered.map(\.identifier) == ["arm.ok"])
         }
 
         // MARK: - Errores

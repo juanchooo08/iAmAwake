@@ -25,6 +25,10 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
         _ = await ensureAuthorized()
     }
 
+    public func notifyArmed() async {
+        await send(NotificationTexts.armed)
+    }
+
     public func notifyDisarmed(reason: DisarmReason) async {
         guard let payload = NotificationTexts.disarmed(reason) else { return }
         await send(payload)

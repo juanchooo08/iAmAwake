@@ -71,6 +71,10 @@ public final class PowerState: ObservableObject {
         }
 
         status = .armed
+        // Degradado ya aviso por `notifyFailure`: no se avisa dos veces.
+        if lastError == nil {
+            await notifier.notifyArmed()
+        }
     }
 
     public func requestDisarm(reason: DisarmReason) async {
@@ -88,7 +92,9 @@ public final class PowerState: ObservableObject {
             lastError = e
         }
 
-        if wasArmed, reason != .user, reason != .appTerminating {
+        // Salir de la app no notifica: la cerraste vos, y ademas ese camino corre
+        // con el hilo principal bloqueado. El resto de los motivos si.
+        if wasArmed, reason != .appTerminating {
             await notifier.notifyDisarmed(reason: reason)
         }
     }
