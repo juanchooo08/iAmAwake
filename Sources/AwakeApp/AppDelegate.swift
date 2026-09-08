@@ -7,6 +7,7 @@ import Hotkey
 import LidObserver
 import MenuBar
 import Notifier
+import os
 import Overlay
 import PowerAssertion
 import Preferences
@@ -54,6 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Cuenta cuanto estuvo cerrada la tapa. Ver `LidSessionTracker`.
     private let lidSessions = LidSessionTracker()
+
+    private static let log = Logger(subsystem: "dev.local.iamawake", category: "app")
 
     /// Tope para el desarme sincrono de `applicationWillTerminate`.
     private static let terminationTimeout: TimeInterval = 2.0
@@ -108,8 +111,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Render inicial: el sink de Combine solo dispara ante cambios.
         presenter.render(powerState.status)
 
+        ForegroundNotificationPresenter.install()
+
         Task { [notifier, lid] in
             await notifier.requestAuthorizationIfNeeded()
+            await ForegroundNotificationPresenter.logSettings()
             if await lid.installState == .notInstalled {
                 await self.warnHelperMissing()
             }
@@ -238,6 +244,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let state = powerState
         do {
             try hotkeys.register(combo) {
+                Self.log.notice("atajo apretado")
                 Task { @MainActor in await state.toggle() }
             }
             registeredHotkey = combo

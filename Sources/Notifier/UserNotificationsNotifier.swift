@@ -1,5 +1,6 @@
 import Foundation
 import AwakeCore
+import os
 
 /// Implementacion de `Notifying` sobre `UNUserNotificationCenter`.
 ///
@@ -11,6 +12,8 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
     private enum Authorization {
         case unknown, granted
     }
+
+    private static let log = Logger(subsystem: "dev.local.iamawake", category: "notificaciones")
 
     private let center: NotificationDelivering
     private let lock = NSLock()
@@ -42,10 +45,11 @@ public final class UserNotificationsNotifier: Notifying, @unchecked Sendable {
 
     private func send(_ payload: NotificationPayload) async {
         guard await ensureAuthorized() else {
-            NSLog("[iAmAwake] notificacion no entregada (permiso denegado): \(payload.body)")
+            Self.log.error("sin permiso, no se entrega: \(payload.identifier, privacy: .public)")
             return
         }
         await center.deliver(payload)
+        Self.log.notice("entregada: \(payload.identifier, privacy: .public)")
     }
 
     /// Pide el permiso a lo sumo una vez; llamadas concurrentes comparten la misma tarea.
