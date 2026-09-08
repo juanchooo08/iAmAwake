@@ -137,10 +137,15 @@ Además fuerza `disablesleep 0` al arrancar, por si quedó colgado de un crash.
    registrarla. Si otra app la tiene tomada, falla ahí y te avisa.
 8. **`Preferences` duplica el formateador de hotkey** de `Hotkey`, porque el
    contrato prohíbe la dependencia cruzada. Cosmético.
-9. **La bajada de la cortina no se ve, y no tiene arreglo.** Medido en este
-   hardware: el sistema detecta el cierre correctamente (se registraron ambas
-   transiciones, `closed` y `open`, con 31 s entre medio), pero para cuando
-   avisa, el backlight ya se apagó. La cortina baja sobre una pantalla negra. macOS reporta la
+9. **La bajada de la cortina apenas se percibe.** Medido en este hardware, no
+   supuesto: el sistema detecta el cierre correctamente, y la pantalla se apaga
+   **204 ms** después de esa detección. La bajada dura 140 ms, así que entra
+   completa en esa ventana. Lo que queda como límite no es el software sino el
+   ángulo: cuando el sistema avisa, la tapa ya está a ~5° del cierre, y por esa
+   rendija se percibe luz, no formas. Por eso al cerrar el dobladillo es una
+   banda de luz ancha en vez del filito fino que usa al abrir. Para una
+   animación progresiva mientras bajás la tapa haría falta el sensor de ángulo,
+   que existe solo en los MacBook Pro 2021+. macOS reporta la
    tapa con un booleano (`AppleClamshellState`) que cambia recién a ~5° del
    cierre, y el backlight se apaga a los ~0,2 s. El sensor de ángulo que daría
    una animación progresiva existe solo en los MacBook Pro 2021+, que lo publican

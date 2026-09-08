@@ -12,7 +12,10 @@ import QuartzCore
 @MainActor
 public final class CurtainOverlayController: OverlayPresenting {
 
-    private static let slideDown: CFTimeInterval = 0.30
+    /// 140 ms no es capricho: medido en este hardware, la pantalla se apaga
+    /// 204 ms despues de que el sistema detecta la tapa cerrada. Una bajada mas
+    /// lenta se corta a mitad de camino y no llega a completarse nunca.
+    private static let slideDown: CFTimeInterval = 0.14
     private static let slideUp: CFTimeInterval = 0.42
     /// Cuanto se queda la cortina abajo antes de levantarse al abrir la tapa.
     /// Es el unico momento en que el texto se lee de verdad, pero de mas se
@@ -136,7 +139,10 @@ public final class CurtainOverlayController: OverlayPresenting {
         CATransaction.setDisableActions(true)
 
         curtain.frame = CGRect(origin: .zero, size: size)
-        Self.layoutHem(curtain)
+        // Al cerrar, el dobladillo es una banda de luz ancha. Por una rendija de
+        // 5 grados no se percibe una cortina negra sobre fondo negro; se percibe
+        // luz que barre hacia abajo.
+        Self.layoutHem(curtain, closing: copy.motion == .closing)
 
         let center = size.height / 2
         headline?.contentsScale = scale
@@ -205,20 +211,25 @@ public final class CurtainOverlayController: OverlayPresenting {
 
     /// El dobladillo: una linea de luz en el borde de abajo. Es lo que hace que
     /// se lea como una cortina que baja y no como la pantalla apagandose.
-    private static func layoutHem(_ curtain: CALayer) {
+    private static func layoutHem(_ curtain: CALayer, closing: Bool = false) {
         let hem = curtain.sublayers?.first(where: { $0.name == "hem" }) as? CAGradientLayer ?? {
             let layer = CAGradientLayer()
             layer.name = "hem"
-            layer.colors = [
-                NSColor.white.withAlphaComponent(0.30).cgColor,
-                NSColor.white.withAlphaComponent(0.0).cgColor,
-            ]
             layer.startPoint = CGPoint(x: 0.5, y: 0)
             layer.endPoint = CGPoint(x: 0.5, y: 1)
             curtain.insertSublayer(layer, at: 0)
             return layer
         }()
-        hem.frame = CGRect(x: 0, y: 0, width: curtain.bounds.width, height: 14)
+        let alpha: CGFloat = closing ? 0.95 : 0.30
+        hem.colors = [
+            NSColor.white.withAlphaComponent(alpha).cgColor,
+            NSColor.white.withAlphaComponent(0.0).cgColor,
+        ]
+        hem.frame = CGRect(
+            x: 0, y: 0,
+            width: curtain.bounds.width,
+            height: closing ? min(curtain.bounds.height * 0.18, 160) : 14
+        )
     }
 
     private static func makeText(size: CGFloat, weight: NSFont.Weight, alpha: CGFloat) -> CATextLayer {
