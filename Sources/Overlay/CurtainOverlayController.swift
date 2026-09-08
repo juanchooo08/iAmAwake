@@ -12,12 +12,13 @@ import QuartzCore
 @MainActor
 public final class CurtainOverlayController: OverlayPresenting {
 
-    private static let slideDown: CFTimeInterval = 0.45
-    private static let slideUp: CFTimeInterval = 0.70
+    private static let slideDown: CFTimeInterval = 0.30
+    private static let slideUp: CFTimeInterval = 0.42
     /// Cuanto se queda la cortina abajo antes de levantarse al abrir la tapa.
-    /// Es el unico momento en que el texto se lee de verdad.
-    private static let holdBeforeLift: TimeInterval = 1.6
-    private static let holdAfterClosing: TimeInterval = 1.2
+    /// Es el unico momento en que el texto se lee de verdad, pero de mas se
+    /// siente como que la maquina no responde: abriste la tapa para usarla.
+    private static let holdBeforeLift: TimeInterval = 0.55
+    private static let holdAfterClosing: TimeInterval = 0.9
 
     private var window: NSWindow?
     private var curtain: CALayer?
