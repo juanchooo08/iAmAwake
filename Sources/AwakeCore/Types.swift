@@ -71,12 +71,32 @@ public struct HotkeyCombo: Equatable, Codable, Sendable {
     }
     /// Control + Option + S  (kVK_ANSI_S = 1, controlKey = 0x1000, optionKey = 0x0800)
     public static let defaultCombo = HotkeyCombo(keyCode: 1, modifiers: 0x1000 | 0x0800)
+
+    /// Control + Option + C, para ver la cortina  (kVK_ANSI_C = 8)
+    public static let defaultCurtainCombo = HotkeyCombo(keyCode: 8, modifiers: 0x1000 | 0x0800)
+}
+
+/// Cada atajo que la app registra.
+///
+/// Existe porque hay mas de uno y Carbon los identifica por un entero suyo: sin
+/// una llave estable, registrar el segundo pisaba al primero.
+public enum HotkeySlot: String, CaseIterable, Sendable {
+    /// Armar y desarmar.
+    case toggle
+    /// Reproducir la cortina de cierre a pedido.
+    case curtain
 }
 
 public struct PreferencesSnapshot: Equatable, Codable, Sendable {
     public var batteryThreshold: Int
     public var thermalCeiling: ThermalLevel
     public var hotkey: HotkeyCombo
+    /// Reproduce la cortina de cierre sin cerrar la tapa.
+    ///
+    /// La de cierre real dura 140 ms y el backlight se apaga 204 ms despues de
+    /// que el sistema detecta la tapa: en la practica no se ve nunca. Este
+    /// atajo es la unica forma de mirarla.
+    public var curtainHotkey: HotkeyCombo
     public var batteryGuardEnabled: Bool
     public var thermalGuardEnabled: Bool
     /// Desarmar cuando se cae la red. Sin internet, lo que justificaba tener la
@@ -95,6 +115,7 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         batteryThreshold: Int = 20,
         thermalCeiling: ThermalLevel = .serious,
         hotkey: HotkeyCombo = .defaultCombo,
+        curtainHotkey: HotkeyCombo = .defaultCurtainCombo,
         batteryGuardEnabled: Bool = true,
         thermalGuardEnabled: Bool = true,
         networkGuardEnabled: Bool = true,
@@ -104,6 +125,7 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         self.batteryThreshold = batteryThreshold
         self.thermalCeiling = thermalCeiling
         self.hotkey = hotkey
+        self.curtainHotkey = curtainHotkey
         self.batteryGuardEnabled = batteryGuardEnabled
         self.thermalGuardEnabled = thermalGuardEnabled
         self.networkGuardEnabled = networkGuardEnabled
@@ -120,6 +142,13 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         if c.thermalCeiling == .nominal { c.thermalCeiling = .fair }
         c.networkGraceSeconds = min(max(networkGraceSeconds, Self.networkGraceRange.lowerBound),
                                     Self.networkGraceRange.upperBound)
+        // Dos atajos iguales dejan uno de los dos muerto y sin explicacion:
+        // Carbon rechaza el segundo registro. Gana el de armar, que es el que
+        // importa, y la cortina vuelve a su combinacion de fabrica.
+        if c.curtainHotkey == c.hotkey {
+            c.curtainHotkey = .defaultCurtainCombo
+            if c.curtainHotkey == c.hotkey { c.curtainHotkey = .defaultCombo }
+        }
         return c
     }
 }

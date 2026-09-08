@@ -17,11 +17,16 @@ un atajo global fijo, Carbon alcanza y evita pedirle permisos al usuario.
 
 ## Contrato
 
-- `register(_:action:)` desregistra lo anterior **primero**, instala el handler
+- `register(_:for:action:)` desregistra lo que hubiera en ese slot **primero**,
+  instala el handler
   de eventos una sola vez, y lanza `AwakeError.hotkeyRegistrationFailed(OSStatus)`
   si Carbon rechaza el registro (tipico: `eventHotKeyExistsErr`, la combinacion
   ya la tomo otra app). Nunca falla en silencio.
-- `unregister()` es idempotente.
+- `unregister(_:)` es idempotente; `unregisterAll()` limpia todos los slots.
+- Hay un slot por atajo (`HotkeySlot`): `.toggle` arma y desarma, `.curtain`
+  reproduce la cortina de cierre. Van por slot y no por combinacion porque
+  Carbon identifica los atajos por un entero suyo, y sin llave estable el
+  segundo registro pisaba al primero.
 - Default: ⌃⌥S (`HotkeyCombo.defaultCombo`).
 
 ## Que asume
@@ -43,6 +48,7 @@ un atajo global fijo, Carbon alcanza y evita pedirle permisos al usuario.
 
 `Tests/MenuBarTests/CarbonHotkeyRegistrarTests.swift` inyecta un `MockCarbonAPI`
 via `@testable import Hotkey`: exito, fallo con `OSStatus` (registro y handler),
-doble registro, `unregister()` idempotente y disparo del evento. Nunca se
+doble registro, `unregister(_:)` idempotente, convivencia de dos slots y
+disparo del evento. Nunca se
 registra un atajo real del sistema. `HotkeyFormatterTests` cubre el formateo,
 incluido un keyCode desconocido.

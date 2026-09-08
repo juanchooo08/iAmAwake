@@ -52,7 +52,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
 
-        try sut.register(.defaultCombo) {}
+        try sut.register(.defaultCombo, for: .toggle) {}
 
         #expect(api.installCallCount == 1)
         #expect(api.lastKeyCode == HotkeyCombo.defaultCombo.keyCode)
@@ -66,7 +66,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let sut = CarbonHotkeyRegistrar(api: api)
 
         #expect(throws: AwakeError.hotkeyRegistrationFailed(OSStatus(eventHotKeyExistsErr))) {
-            try sut.register(.defaultCombo) {}
+            try sut.register(.defaultCombo, for: .toggle) {}
         }
         #expect(api.liveTokenIDs.isEmpty)
     }
@@ -77,7 +77,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let sut = CarbonHotkeyRegistrar(api: api)
 
         #expect(throws: AwakeError.hotkeyRegistrationFailed(-50)) {
-            try sut.register(.defaultCombo) {}
+            try sut.register(.defaultCombo, for: .toggle) {}
         }
         #expect(api.registeredIDs.isEmpty, "no debe registrar si el handler fallo")
     }
@@ -86,11 +86,11 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
         var fired = 0
-        try sut.register(.defaultCombo) { fired += 1 }
+        try sut.register(.defaultCombo, for: .toggle) { fired += 1 }
 
         api.registerStatus = OSStatus(eventHotKeyExistsErr)
         #expect(throws: AwakeError.self) {
-            try sut.register(HotkeyCombo(keyCode: 2, modifiers: 0)) {}
+            try sut.register(HotkeyCombo(keyCode: 2, modifiers: 0), for: .toggle) {}
         }
 
         // El registro previo se solto antes de intentar el nuevo.
@@ -103,8 +103,8 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
 
-        try sut.register(.defaultCombo) {}
-        try sut.register(HotkeyCombo(keyCode: 2, modifiers: UInt32(cmdKey))) {}
+        try sut.register(.defaultCombo, for: .toggle) {}
+        try sut.register(HotkeyCombo(keyCode: 2, modifiers: UInt32(cmdKey)), for: .toggle) {}
 
         #expect(api.registeredIDs.count == 2)
         #expect(api.unregisteredIDs == [api.registeredIDs[0]])
@@ -114,17 +114,49 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         #expect(api.lastKeyCode == 2)
     }
 
+    @Test func dosSlotsConvivenSinPisarse() throws {
+        let api = MockCarbonAPI()
+        let sut = CarbonHotkeyRegistrar(api: api)
+        var armados = 0
+        var cortinas = 0
+
+        try sut.register(.defaultCombo, for: .toggle) { armados += 1 }
+        try sut.register(.defaultCurtainCombo, for: .curtain) { cortinas += 1 }
+
+        #expect(api.liveTokenIDs.count == 2, "registrar el segundo no debe desregistrar el primero")
+
+        api.simulateFire(id: api.registeredIDs[0])
+        api.simulateFire(id: api.registeredIDs[1])
+
+        #expect(armados == 1)
+        #expect(cortinas == 1)
+    }
+
+    @Test func desregistrarUnSlotDejaVivoAlOtro() throws {
+        let api = MockCarbonAPI()
+        let sut = CarbonHotkeyRegistrar(api: api)
+        var cortinas = 0
+
+        try sut.register(.defaultCombo, for: .toggle) {}
+        try sut.register(.defaultCurtainCombo, for: .curtain) { cortinas += 1 }
+        sut.unregister(.toggle)
+
+        #expect(api.liveTokenIDs == [api.registeredIDs[1]])
+        api.simulateFire(id: api.registeredIDs[1])
+        #expect(cortinas == 1)
+    }
+
     @Test func testUnregisterIsIdempotent() throws {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
 
-        sut.unregister()
+        sut.unregister(.toggle)
         #expect(api.unregisteredIDs.isEmpty)
 
-        try sut.register(.defaultCombo) {}
-        sut.unregister()
-        sut.unregister()
-        sut.unregister()
+        try sut.register(.defaultCombo, for: .toggle) {}
+        sut.unregister(.toggle)
+        sut.unregister(.toggle)
+        sut.unregister(.toggle)
 
         #expect(api.unregisteredIDs.count == 1)
         #expect(api.liveTokenIDs.isEmpty)
@@ -134,7 +166,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
         var fired = 0
-        try sut.register(.defaultCombo) { fired += 1 }
+        try sut.register(.defaultCombo, for: .toggle) { fired += 1 }
 
         api.simulateFire(id: try try #require(api.registeredIDs.first))
         api.simulateFire(id: try try #require(api.registeredIDs.first))
@@ -145,7 +177,7 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
         var fired = 0
-        try sut.register(.defaultCombo) { fired += 1 }
+        try sut.register(.defaultCombo, for: .toggle) { fired += 1 }
 
         api.simulateFire(id: 999)
         #expect(fired == 0)
@@ -156,8 +188,8 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let sut = CarbonHotkeyRegistrar(api: api)
         var old = 0
         var new = 0
-        try sut.register(.defaultCombo) { old += 1 }
-        try sut.register(HotkeyCombo(keyCode: 2, modifiers: 0)) { new += 1 }
+        try sut.register(.defaultCombo, for: .toggle) { old += 1 }
+        try sut.register(HotkeyCombo(keyCode: 2, modifiers: 0), for: .toggle) { new += 1 }
 
         api.simulateFire(id: api.registeredIDs[0])
         api.simulateFire(id: api.registeredIDs[1])
@@ -169,9 +201,9 @@ private final class MockCarbonAPI: CarbonHotkeyAPI {
         let api = MockCarbonAPI()
         let sut = CarbonHotkeyRegistrar(api: api)
         var fired = 0
-        try sut.register(.defaultCombo) { fired += 1 }
+        try sut.register(.defaultCombo, for: .toggle) { fired += 1 }
         let id = try try #require(api.registeredIDs.first)
-        sut.unregister()
+        sut.unregister(.toggle)
 
         api.simulateFire(id: id)
         #expect(fired == 0)

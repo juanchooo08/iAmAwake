@@ -68,8 +68,9 @@ public protocol StatusPresenting: AnyObject {
 }
 
 public protocol HotkeyRegistering: AnyObject {
-    func register(_ combo: HotkeyCombo, action: @escaping @MainActor () -> Void) throws
-    func unregister()
+    func register(_ combo: HotkeyCombo, for slot: HotkeySlot, action: @escaping @MainActor () -> Void) throws
+    func unregister(_ slot: HotkeySlot)
+    func unregisterAll()
 }
 
 public protocol PreferencesStoring: AnyObject, Sendable {

@@ -51,7 +51,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var preferencesTask: Task<Void, Never>?
     private var heartbeatTimer: Timer?
     private var preferencesWindow: PreferencesWindowController?
-    private var registeredHotkey: HotkeyCombo?
+    private var registeredHotkeys: [HotkeySlot: HotkeyCombo] = [:]
 
     /// Cuenta cuanto estuvo cerrada la tapa. Ver `LidSessionTracker`.
     private let lidSessions = LidSessionTracker()
@@ -106,7 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startGuards()
         observeLid()
         observePreferences()
-        registerHotkey(preferencesStore.snapshot.hotkey)
+        registerHotkeys(preferencesStore.snapshot)
 
         // Render inicial: el sink de Combine solo dispara ante cambios.
         presenter.render(powerState.status)
@@ -148,7 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         preferencesTask?.cancel()
         preferencesTask = nil
         statusSubscription = nil
-        hotkeys.unregister()
+        hotkeys.unregisterAll()
         lidObserver.stopMonitoring()
         overlay.dismiss()
         for guardImpl in guardList { guardImpl.stop() }
@@ -229,7 +229,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             for await snapshot in preferencesStore.changes {
                 if Task.isCancelled { return }
                 await powerState.applyPreferences(snapshot)
-                self?.registerHotkey(snapshot.hotkey)
+                self?.registerHotkeys(snapshot)
             }
         }
     }
@@ -239,20 +239,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Re-registra solo si la combinacion cambio: `register` desregistra la
     /// anterior, y repetirlo en cada cambio de preferencia (volumen de batería,
     /// techo termico) seria trabajo inutil sobre Carbon.
-    private func registerHotkey(_ combo: HotkeyCombo) {
-        guard registeredHotkey != combo else { return }
+    private func registerHotkeys(_ snapshot: PreferencesSnapshot) {
         let state = powerState
+        registerHotkey(snapshot.hotkey, for: .toggle) {
+            Self.log.notice("atajo apretado")
+            Task { @MainActor in await state.toggle() }
+        }
+
+        // La cortina de cierre real dura 140 ms y el backlight se apaga poco
+        // despues: en un cierre de tapa de verdad no se llega a ver. Este atajo
+        // la reproduce a pedido, con la tapa abierta.
+        let overlay = self.overlay
+        let animaciones = snapshot.animationsEnabled
+        registerHotkey(snapshot.curtainHotkey, for: .curtain) {
+            Self.log.notice("atajo de cortina apretado")
+            // Si apagaste las animaciones, este atajo tampoco dibuja nada: seria
+            // la unica forma de que aparezcan estando desactivadas.
+            guard animaciones else { return }
+            overlay.play(LidTransition(to: .closed, wasArmed: true))
+        }
+    }
+
+    private func registerHotkey(
+        _ combo: HotkeyCombo,
+        for slot: HotkeySlot,
+        action: @escaping @MainActor () -> Void
+    ) {
+        guard registeredHotkeys[slot] != combo else { return }
         do {
-            try hotkeys.register(combo) {
-                Self.log.notice("atajo apretado")
-                Task { @MainActor in await state.toggle() }
-            }
-            registeredHotkey = combo
+            try hotkeys.register(combo, for: slot, action: action)
+            registeredHotkeys[slot] = combo
         } catch let error as AwakeError {
-            registeredHotkey = nil
+            registeredHotkeys[slot] = nil
             Task { [notifier] in await notifier.notifyFailure(error) }
         } catch {
-            registeredHotkey = nil
+            registeredHotkeys[slot] = nil
         }
     }
 

@@ -1,6 +1,6 @@
 # Estado
 
-- 205 tests en 18 suites pasan; `swift build -c release` sin warnings.
+- 209 tests en 18 suites pasan; `swift build -c release` sin warnings.
 - Renombre StillOn -> iAmAwake completo. El proyecto vive en
   `/Users/juancho/Documents/SAAS FAC/iAmAwake/iAmAwake`.
 - Daemon `dev.local.iamawaked` instalado y probado contra el socket real.
@@ -19,11 +19,15 @@
 - `--check-notifications` corre dentro del run loop de AppKit. En el codigo de
   nivel superior de `main.swift` se colgaba para siempre.
 
+- Dos atajos: Ctrl+Opt+S arma/desarma, Ctrl+Opt+C reproduce la cortina de
+  cierre. El segundo existe porque la cortina real no se puede ver: dura 140 ms
+  y el backlight se apaga 204 ms despues de que el sistema detecta la tapa. Es
+  el reemplazo acordado para la deteccion automatica, que este hardware no
+  permite (no expone angulo de tapa; `AppleClamshellState` avisa a ~5 grados).
+
 Pendiente:
-- Atajo de teclado dedicado que reproduzca la cortina de cierre a pedido. Es el
-  reemplazo acordado para la deteccion automatica, que es imposible: este
-  hardware no expone angulo de tapa y `AppleClamshellState` avisa recien a ~5
-  grados del cierre, 204 ms antes de que se apague el backlight.
+- El atajo de la cortina no se puede cambiar desde la UI de preferencias todavia
+  (se guarda y se lee, pero no hay capturador). Tampoco aparece en el menu.
 - `Scripts/test.sh` no limpia: al cambiar el layout de un struct publico hay que
   borrar `.build/debug` o la suite falla con corrupcion de memoria.
 

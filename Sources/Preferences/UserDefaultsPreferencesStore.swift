@@ -15,6 +15,8 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
         static let thermalCeiling = "thermalCeiling"
         static let hotkeyKeyCode = "hotkeyKeyCode"
         static let hotkeyModifiers = "hotkeyModifiers"
+        static let curtainHotkeyKeyCode = "curtainHotkeyKeyCode"
+        static let curtainHotkeyModifiers = "curtainHotkeyModifiers"
         static let batteryGuardEnabled = "batteryGuardEnabled"
         static let thermalGuardEnabled = "thermalGuardEnabled"
     }
@@ -86,6 +88,8 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
             batteryThreshold: int(defaults, Key.batteryThreshold) ?? fallback.batteryThreshold,
             thermalCeiling: thermal(defaults) ?? fallback.thermalCeiling,
             hotkey: hotkey(defaults) ?? fallback.hotkey,
+            curtainHotkey: combo(defaults, Key.curtainHotkeyKeyCode, Key.curtainHotkeyModifiers)
+                ?? fallback.curtainHotkey,
             batteryGuardEnabled: bool(defaults, Key.batteryGuardEnabled) ?? fallback.batteryGuardEnabled,
             thermalGuardEnabled: bool(defaults, Key.thermalGuardEnabled) ?? fallback.thermalGuardEnabled
         )
@@ -98,6 +102,8 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
         defaults.set(snapshot.thermalCeiling.rawValue, forKey: Key.thermalCeiling)
         defaults.set(Int(snapshot.hotkey.keyCode), forKey: Key.hotkeyKeyCode)
         defaults.set(Int(snapshot.hotkey.modifiers), forKey: Key.hotkeyModifiers)
+        defaults.set(Int(snapshot.curtainHotkey.keyCode), forKey: Key.curtainHotkeyKeyCode)
+        defaults.set(Int(snapshot.curtainHotkey.modifiers), forKey: Key.curtainHotkeyModifiers)
         defaults.set(snapshot.batteryGuardEnabled, forKey: Key.batteryGuardEnabled)
         defaults.set(snapshot.thermalGuardEnabled, forKey: Key.thermalGuardEnabled)
     }
@@ -122,8 +128,16 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
     }
 
     private static func hotkey(_ defaults: UserDefaults) -> HotkeyCombo? {
-        guard let code = int(defaults, Key.hotkeyKeyCode),
-              let mods = int(defaults, Key.hotkeyModifiers),
+        combo(defaults, Key.hotkeyKeyCode, Key.hotkeyModifiers)
+    }
+
+    private static func combo(
+        _ defaults: UserDefaults,
+        _ codeKey: String,
+        _ modsKey: String
+    ) -> HotkeyCombo? {
+        guard let code = int(defaults, codeKey),
+              let mods = int(defaults, modsKey),
               code >= 0, code <= Int(UInt32.max),
               mods >= 0, mods <= Int(UInt32.max)
         else { return nil }

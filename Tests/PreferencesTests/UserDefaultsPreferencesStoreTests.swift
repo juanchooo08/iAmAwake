@@ -253,4 +253,24 @@ import Testing
         let raw = cocoaControl | cocoaOption
         #expect(HotkeyDisplay.carbonModifiers(fromCocoaRawValue: raw) == 0x1000 | 0x0800)
     }
+
+    @Test func dosAtajosIgualesNoDejanUnoMuerto() {
+        let choque = PreferencesSnapshot(hotkey: .defaultCombo, curtainHotkey: .defaultCombo)
+        let arreglado = choque.clamped()
+
+        #expect(arreglado.hotkey == .defaultCombo, "gana el de armar")
+        #expect(arreglado.curtainHotkey != arreglado.hotkey)
+    }
+
+    @Test func elAtajoDeCortinaSobreviveAlReinicio() {
+        let suite = "test.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { UserDefaults().removePersistentDomain(forName: suite) }
+        let combo = HotkeyCombo(keyCode: 40, modifiers: 0x0100)
+
+        let store = UserDefaultsPreferencesStore(defaults: defaults)
+        store.update { $0.curtainHotkey = combo }
+
+        #expect(UserDefaultsPreferencesStore(defaults: defaults).snapshot.curtainHotkey == combo)
+    }
 }
