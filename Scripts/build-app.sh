@@ -19,6 +19,13 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/iAmAwake" "$APP/Contents/MacOS/iAmAwake"
 
+# Sin icono, las notificaciones salen con el generico gris de macOS.
+if [ -f "$PKG/Resources/AppIcon.icns" ]; then
+  cp "$PKG/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+else
+  echo "AVISO: falta Resources/AppIcon.icns (correr: swift Scripts/make-icon.swift)" >&2
+fi
+
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -28,6 +35,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleDisplayName</key><string>iAmAwake</string>
     <key>CFBundleIdentifier</key><string>dev.local.iamawake</string>
     <key>CFBundleExecutable</key><string>iAmAwake</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>$VERSION</string>
     <key>CFBundleVersion</key><string>$VERSION</string>

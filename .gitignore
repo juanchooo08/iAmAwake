@@ -4,3 +4,7 @@ build/
 .DS_Store
 *.xcodeproj
 .swiftpm/
+
+# El iconset es intermedio: se regenera con Scripts/make-icon.swift.
+# Lo que hace falta para armar el bundle es Resources/AppIcon.icns.
+Resources/AppIcon.iconset/
