@@ -26,9 +26,11 @@
   permite (no expone angulo de tapa; `AppleClamshellState` avisa a ~5 grados).
 
 - `Ver la cortina` esta en el menu, con su atajo escrito en el titulo.
-- Icono propio (ojo abierto sobre fondo de noche). Se dibuja por codigo con
-  `swift Scripts/make-icon.swift` y se empaqueta como `Resources/AppIcon.icns`;
-  sin el, las notificaciones salian con el generico gris de macOS.
+- Icono propio (ojo abierto sobre fondo de noche). La fuente
+  `Resources/icon-source.png` la genero Gemini via OpenRouter;
+  `swift Scripts/make-icon.swift` la recorta, la enmascara con la esquina de
+  macOS y arma `Resources/AppIcon.icns`. Sin icono, las notificaciones salian
+  con el generico gris.
 
 Pendiente:
 - El atajo de la cortina no se puede cambiar desde la UI de preferencias todavia
