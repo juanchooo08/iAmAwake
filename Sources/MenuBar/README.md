@@ -15,8 +15,8 @@ Implementa `StatusPresenting` (`AwakeCore`) con un `NSStatusItem`.
 
 | `ArmState` | SF Symbol | Toggle |
 |---|---|---|
-| `.disarmed` | `moon.zzz` | Armar |
-| `.armed` | `bolt.fill` | Desarmar |
+| `.disarmed` | `eye.slash` | Armar |
+| `.armed` | `eye` | Desarmar |
 | `.blockedLowBattery(p)` | `battery.25` | Armar |
 | `.blockedThermal(l)` | `thermometer.high` | Armar |
 | `.failed(e)` | `exclamationmark.triangle` | Armar |

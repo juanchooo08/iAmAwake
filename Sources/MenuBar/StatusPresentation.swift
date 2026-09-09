@@ -68,7 +68,7 @@ public struct StatusPresentation: Equatable, Sendable {
         switch state {
         case .disarmed:
             self.init(
-                symbolName: "moon.zzz",
+                symbolName: "eye.slash",
                 accessibilityDescription: "Desarmado",
                 tooltip: "Desarmado",
                 toggleTitle: "Armar",
@@ -77,7 +77,7 @@ public struct StatusPresentation: Equatable, Sendable {
 
         case .armed:
             self.init(
-                symbolName: "bolt.fill",
+                symbolName: "eye",
                 accessibilityDescription: "Armado — la Mac no dormirá",
                 tooltip: "Armado — la Mac no dormirá",
                 toggleTitle: "Desarmar",

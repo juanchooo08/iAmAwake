@@ -17,7 +17,7 @@ import AwakeCore
 
     @Test func testDisarmed() {
         let p = StatusPresentation(state: .disarmed)
-        #expect(p.symbolName == "moon.zzz")
+        #expect(p.symbolName == "eye.slash")
         #expect(p.tooltip == "Desarmado")
         #expect(p.accessibilityDescription == "Desarmado")
         #expect(p.toggleTitle == "Armar")
@@ -26,7 +26,7 @@ import AwakeCore
 
     @Test func testArmed() {
         let p = StatusPresentation(state: .armed)
-        #expect(p.symbolName == "bolt.fill")
+        #expect(p.symbolName == "eye")
         #expect(p.tooltip == "Armado — la Mac no dormirá")
         #expect(p.accessibilityDescription == "Armado — la Mac no dormirá")
         #expect(p.toggleTitle == "Desarmar")
