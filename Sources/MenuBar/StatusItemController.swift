@@ -11,12 +11,14 @@ public final class StatusItemController: NSObject, StatusPresenting {
     public var onToggle: (() -> Void)?
     public var onOpenPreferences: (() -> Void)?
     public var onQuit: (() -> Void)?
+    public var onPreviewCurtain: (() -> Void)?
 
     private let statusBar: NSStatusBar
     private let statusItem: NSStatusItem
     private let menu = NSMenu()
     private let toggleItem = NSMenuItem()
     private let statusLineItem = NSMenuItem()
+    private let curtainItem = NSMenuItem()
 
     /// Ultima presentacion renderizada. Expuesta para inspeccion y debugging.
     public private(set) var presentation: StatusPresentation
@@ -52,6 +54,15 @@ public final class StatusItemController: NSObject, StatusPresenting {
 
         menu.addItem(.separator())
 
+        curtainItem.title = Self.curtainTitle
+        curtainItem.target = self
+        curtainItem.action = #selector(handlePreviewCurtain)
+        curtainItem.isEnabled = true
+        curtainItem.toolTip = "La cortina real no se llega a ver: la pantalla se apaga antes."
+        menu.addItem(curtainItem)
+
+        menu.addItem(.separator())
+
         let prefsItem = NSMenuItem(
             title: "Preferencias…",
             action: #selector(handleOpenPreferences),
@@ -69,6 +80,19 @@ public final class StatusItemController: NSObject, StatusPresenting {
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+    }
+
+    private static let curtainTitle = "Ver la cortina"
+
+    /// El atajo va en el titulo y no en `keyEquivalent` a proposito: el de la
+    /// cortina es un atajo global de Carbon, y un `keyEquivalent` solo dispara
+    /// con la app al frente. Ponerlo ahi prometeria algo que no cumple.
+    public func showCurtainShortcut(_ display: String?) {
+        guard let display, !display.isEmpty else {
+            curtainItem.title = Self.curtainTitle
+            return
+        }
+        curtainItem.title = "\(Self.curtainTitle)  \(display)"
     }
 
     private func apply(_ next: StatusPresentation) {
@@ -115,4 +139,5 @@ public final class StatusItemController: NSObject, StatusPresenting {
     @objc private func handleToggle() { onToggle?() }
     @objc private func handleOpenPreferences() { onOpenPreferences?() }
     @objc private func handleQuit() { onQuit?() }
+    @objc private func handlePreviewCurtain() { onPreviewCurtain?() }
 }

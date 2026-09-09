@@ -65,6 +65,11 @@ public protocol StatusPresenting: AnyObject {
     var onToggle: (() -> Void)? { get set }
     var onOpenPreferences: (() -> Void)? { get set }
     var onQuit: (() -> Void)? { get set }
+    /// Reproducir la cortina de cierre a pedido.
+    var onPreviewCurtain: (() -> Void)? { get set }
+    /// Muestra el atajo de la cortina al lado del item, para que se pueda
+    /// descubrir. `nil` deja el item sin atajo a la vista.
+    func showCurtainShortcut(_ display: String?)
 }
 
 public protocol HotkeyRegistering: AnyObject {

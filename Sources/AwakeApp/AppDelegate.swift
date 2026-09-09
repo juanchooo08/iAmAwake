@@ -178,6 +178,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         presenter.onQuit = {
             NSApp.terminate(nil)
         }
+        presenter.onPreviewCurtain = { [weak self] in
+            self?.playCurtainPreview()
+        }
+        presenter.showCurtainShortcut(preferencesStore.snapshot.curtainHotkey.displayString)
+    }
+
+    /// Reproduce la cortina de cierre con la tapa abierta.
+    ///
+    /// La real dura 140 ms y el backlight se apaga 204 ms despues de que el
+    /// sistema detecta la tapa: no se llega a ver nunca.
+    private func playCurtainPreview() {
+        // Si apagaste las animaciones, esto tampoco dibuja: seria la unica forma
+        // de que aparezcan estando desactivadas.
+        guard preferencesStore.snapshot.animationsEnabled else { return }
+        overlay.play(LidTransition(to: .closed, wasArmed: true))
     }
 
     /// Se suscribe al `@Published` y renderiza **el valor que llega por parametro**.
@@ -230,6 +245,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if Task.isCancelled { return }
                 await powerState.applyPreferences(snapshot)
                 self?.registerHotkeys(snapshot)
+                self?.presenter?.showCurtainShortcut(snapshot.curtainHotkey.displayString)
             }
         }
     }
@@ -249,14 +265,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // La cortina de cierre real dura 140 ms y el backlight se apaga poco
         // despues: en un cierre de tapa de verdad no se llega a ver. Este atajo
         // la reproduce a pedido, con la tapa abierta.
-        let overlay = self.overlay
-        let animaciones = snapshot.animationsEnabled
-        registerHotkey(snapshot.curtainHotkey, for: .curtain) {
+        registerHotkey(snapshot.curtainHotkey, for: .curtain) { [weak self] in
             Self.log.notice("atajo de cortina apretado")
-            // Si apagaste las animaciones, este atajo tampoco dibuja nada: seria
-            // la unica forma de que aparezcan estando desactivadas.
-            guard animaciones else { return }
-            overlay.play(LidTransition(to: .closed, wasArmed: true))
+            self?.playCurtainPreview()
         }
     }
 

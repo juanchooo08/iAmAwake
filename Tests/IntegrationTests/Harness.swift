@@ -13,6 +13,12 @@ final class FakePresenter: StatusPresenting {
     var onToggle: (() -> Void)?
     var onOpenPreferences: (() -> Void)?
     var onQuit: (() -> Void)?
+    var onPreviewCurtain: (() -> Void)?
+
+    /// Ultimo atajo que el menu muestra al lado de "Ver la cortina".
+    private(set) var curtainShortcut: String?
+
+    func showCurtainShortcut(_ display: String?) { curtainShortcut = display }
 
     private(set) var rendered: [ArmState] = []
 

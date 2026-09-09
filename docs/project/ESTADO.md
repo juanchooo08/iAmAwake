@@ -25,9 +25,13 @@
   el reemplazo acordado para la deteccion automatica, que este hardware no
   permite (no expone angulo de tapa; `AppleClamshellState` avisa a ~5 grados).
 
+- `Ver la cortina` esta en el menu, con su atajo escrito en el titulo.
+
 Pendiente:
 - El atajo de la cortina no se puede cambiar desde la UI de preferencias todavia
-  (se guarda y se lee, pero no hay capturador). Tampoco aparece en el menu.
+  (se guarda y se lee, pero no hay capturador).
+- `StatusItemController` sigue sin tests: instanciarlo crea un `NSStatusItem`
+  real. Lo que se puede testear sin AppKit vive en `StatusPresentation`.
 - `Scripts/test.sh` no limpia: al cambiar el layout de un struct publico hay que
   borrar `.build/debug` o la suite falla con corrupcion de memoria.
 

@@ -25,8 +25,11 @@ Imagenes template, con `accessibilityDescription` en todas.
 
 ## Menu
 
-toggle · linea de estado (deshabilitada) · separador · `Preferencias…` (⌘,) ·
-separador · `Salir` (⌘Q). `menu.autoenablesItems = false` para que la linea de
+toggle · linea de estado (deshabilitada) · separador · `Ver la cortina` ·
+separador · `Preferencias…` (⌘,) · separador · `Salir` (⌘Q).
+
+`Ver la cortina` muestra su atajo en el titulo y no en `keyEquivalent`: es un
+atajo global de Carbon, y un `keyEquivalent` solo dispara con la app al frente. `menu.autoenablesItems = false` para que la linea de
 estado se quede gris.
 
 ## Que asume
