@@ -32,6 +32,15 @@
   macOS y arma `Resources/AppIcon.icns`. Sin icono, las notificaciones salian
   con el generico gris.
 
+Si cambias el icono y las notificaciones siguen mostrando el generico gris:
+reiniciar `NotificationCenter`, que es el que dibuja los banners. No alcanza con
+`killall usernoted` (ese solo entrega), ni con limpiar
+`/Library/Caches/com.apple.iconservices.store`, ni con apagar y prender las
+notificaciones en Configuracion del Sistema. Probados los cuatro; solo el
+primero sirvio:
+
+    killall NotificationCenter
+
 Pendiente:
 - El atajo de la cortina no se puede cambiar desde la UI de preferencias todavia
   (se guarda y se lee, pero no hay capturador).
