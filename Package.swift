@@ -30,7 +30,7 @@ let package = Package(
         .testTarget(name: "HelperClientTests", dependencies: ["HelperClient", "AwakeCore"]),
         .testTarget(name: "MenuBarTests", dependencies: ["MenuBar", "Hotkey", "AwakeCore"]),
         .testTarget(name: "GuardsTests", dependencies: ["Guards", "AwakeCore"]),
-        .testTarget(name: "PreferencesTests", dependencies: ["Preferences", "AwakeCore"]),
+        .testTarget(name: "PreferencesTests", dependencies: ["Preferences", "Notifier", "AwakeCore"]),
         .testTarget(name: "LidObserverTests", dependencies: ["LidObserver", "AwakeCore"]),
         .testTarget(name: "OverlayTests", dependencies: ["Overlay", "AwakeCore"]),
         .testTarget(name: "IntegrationTests", dependencies: [
