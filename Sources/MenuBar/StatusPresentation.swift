@@ -113,6 +113,15 @@ public struct StatusPresentation: Equatable, Sendable {
                 statusLine: "Bloqueado — \(span) sin conexión"
             )
 
+        case .blockedClaudeIdle(let seconds):
+            self.init(
+                symbolName: "moon.zzz",
+                accessibilityDescription: "Desarmado: Claude terminó",
+                tooltip: "Desarmado: Claude lleva \(seconds / 60) min sin trabajar",
+                toggleTitle: "Armar",
+                statusLine: "Desarmado — Claude terminó"
+            )
+
         case .failed(let error):
             let detail = StatusText.describe(error)
             self.init(

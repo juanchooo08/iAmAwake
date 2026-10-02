@@ -73,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             BatteryGuard(reader: IOPowerSourcesReader(), preferences: prefs),
             ThermalGuard(reader: ProcessInfoThermalReader(), preferences: prefs),
             NetworkGuard(reader: NWPathReachabilityReader(), preferences: prefs),
+            ClaudeIdleGuard(reader: ClaudeSessionMarkerReader(), preferences: prefs),
         ]
 
         self.preferencesStore = store
@@ -204,7 +205,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 presenter.render(state)
                 self?.syncHeartbeat(for: state)
+                self?.sleepIfGuardDisarmedWithLidClosed(state)
             }
+        }
+    }
+
+    /// Una guarda desarmo con la tapa cerrada: dormir ya.
+    ///
+    /// Volver `disablesleep` a 0 no alcanza. macOS solo evalua el sueno por
+    /// tapa cuando la tapa se mueve; medido el 2026-10-02, siguio despierta y
+    /// caliente mas de 3 min con la tapa cerrada despues del desarme. Para
+    /// entonces `requestDisarm` ya devolvio el cierre de tapa al daemon.
+    private func sleepIfGuardDisarmedWithLidClosed(_ state: ArmState) {
+        // `willSet`: `powerState.status` todavia es el estado anterior.
+        guard powerState.status.isArmed, lidObserver.state == .closed else { return }
+        switch state {
+        case .blockedLowBattery, .blockedThermal, .blockedNetworkLost, .blockedClaudeIdle:
+            Self.log.info("Desarme por guarda con la tapa cerrada: pmset sleepnow")
+            let pmset = Process()
+            pmset.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+            pmset.arguments = ["sleepnow"]
+            try? pmset.run()
+        case .armed, .disarmed, .failed:
+            return
         }
     }
 

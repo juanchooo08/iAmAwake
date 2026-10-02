@@ -27,34 +27,6 @@ private final class MockReachability: NetworkReachabilityReading, @unchecked Sen
     }
 }
 
-/// Temporizador manual: nada corre hasta que el test lo dispara.
-private final class ManualScheduler: DelayScheduling, @unchecked Sendable {
-    private let lock = NSLock()
-    private var pending: (@Sendable () -> Void)?
-    private(set) var lastDelay: TimeInterval?
-    private(set) var cancelCount = 0
-
-    func schedule(after seconds: TimeInterval, _ body: @escaping @Sendable () -> Void) {
-        lock.lock(); pending = body; lastDelay = seconds; lock.unlock()
-    }
-
-    func cancelPending() {
-        lock.lock(); pending = nil; cancelCount += 1; lock.unlock()
-    }
-
-    func fire() {
-        lock.lock(); let b = pending; pending = nil; lock.unlock()
-        b?()
-    }
-}
-
-private final class FakeClock: ClockProviding, @unchecked Sendable {
-    private let lock = NSLock()
-    private var _now = Date(timeIntervalSince1970: 1_000_000)
-    var now: Date { lock.lock(); defer { lock.unlock() }; return _now }
-    func advance(_ s: TimeInterval) { lock.lock(); _now += s; lock.unlock() }
-}
-
 private final class Verdicts: @unchecked Sendable {
     private let lock = NSLock()
     private var items: [GuardVerdict] = []

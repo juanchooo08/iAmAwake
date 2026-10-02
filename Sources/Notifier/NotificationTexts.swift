@@ -49,6 +49,13 @@ public enum NotificationTexts {
                 body: "iAmAwake se desarmó — \(minutes(seconds)) sin conexión. Sin red no hay descargas ni Claude Code que cuidar, así que tu Mac va a poder dormir."
             )
 
+        case .claudeIdle(let seconds):
+            return NotificationPayload(
+                identifier: "disarm.claudeIdle",
+                title: disarmTitle,
+                body: "iAmAwake se desarmó — Claude lleva \(minutes(seconds)) sin trabajar. Tu Mac va a poder dormir y enfriarse."
+            )
+
         case .assertionFailure(let error):
             return NotificationPayload(
                 identifier: "disarm.assertionFailure",

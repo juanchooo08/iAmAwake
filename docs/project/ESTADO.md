@@ -1,6 +1,6 @@
 # Estado
 
-- 209 tests en 18 suites pasan; `swift build -c release` sin warnings.
+- 215 tests pasan; `swift build -c release` sin warnings.
 - Renombre StillOn -> iAmAwake completo. El proyecto vive en
   `/Users/juancho/Documents/SAAS FAC/iAmAwake/iAmAwake`.
 - Daemon `dev.local.iamawaked` instalado y probado contra el socket real.
@@ -40,6 +40,18 @@ notificaciones en Configuracion del Sistema. Probados los cuatro; solo el
 primero sirvio:
 
     killall NotificationCenter
+
+- Quinta guarda: Claude (2026-10-02). Desarma tras 10 min sin ninguna sesion de
+  Claude Code trabajando; la senal son hooks globales de Claude Code (ver
+  `Sources/Guards/README.md`). Techo termico default bajado a `fair`: en esta
+  Air sin ventilador `serious` llega cuando ya quema.
+- Desarmar no dormia la Mac: con la tapa ya cerrada, macOS no reevalua el
+  sueno al volver `disablesleep` a 0 (medido: >3 min despierta). Ahora una
+  guarda que desarma con la tapa cerrada corre `pmset sleepnow` (anda sin root,
+  probado: durmio en 6 s). Falta probar el camino completo armado -> 10 min ->
+  duerme, en una sola corrida.
+- `PreferencesTests` no declaraba `Notifier` en `Package.swift`; con Xcode 27
+  el enlazador lo rechaza. Agregado.
 
 Pendiente:
 - El atajo de la cortina no se puede cambiar desde la UI de preferencias todavia

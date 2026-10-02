@@ -25,6 +25,9 @@ public final class PreferencesViewModel: ObservableObject {
     @Published public var networkGraceSeconds: Int {
         didSet { let v = networkGraceSeconds; push { $0.networkGraceSeconds = v } }
     }
+    @Published public var claudeGuardEnabled: Bool {
+        didSet { let v = claudeGuardEnabled; push { $0.claudeGuardEnabled = v } }
+    }
     @Published public var animationsEnabled: Bool {
         didSet { let v = animationsEnabled; push { $0.animationsEnabled = v } }
     }
@@ -61,6 +64,7 @@ public final class PreferencesViewModel: ObservableObject {
         self.thermalGuardEnabled = snapshot.thermalGuardEnabled
         self.networkGuardEnabled = snapshot.networkGuardEnabled
         self.networkGraceSeconds = snapshot.networkGraceSeconds
+        self.claudeGuardEnabled = snapshot.claudeGuardEnabled
         self.animationsEnabled = snapshot.animationsEnabled
         self.hotkey = snapshot.hotkey
 
@@ -139,6 +143,7 @@ public final class PreferencesViewModel: ObservableObject {
         if thermalGuardEnabled != snapshot.thermalGuardEnabled { thermalGuardEnabled = snapshot.thermalGuardEnabled }
         if networkGuardEnabled != snapshot.networkGuardEnabled { networkGuardEnabled = snapshot.networkGuardEnabled }
         if networkGraceSeconds != snapshot.networkGraceSeconds { networkGraceSeconds = snapshot.networkGraceSeconds }
+        if claudeGuardEnabled != snapshot.claudeGuardEnabled { claudeGuardEnabled = snapshot.claudeGuardEnabled }
         if animationsEnabled != snapshot.animationsEnabled { animationsEnabled = snapshot.animationsEnabled }
         if hotkey != snapshot.hotkey { hotkey = snapshot.hotkey }
         applyingRemoteChange = false

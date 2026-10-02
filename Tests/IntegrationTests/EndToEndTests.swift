@@ -88,7 +88,7 @@ struct EndToEndTests {
         await h.tapMenuToggle()
         h.log.clear()
 
-        h.thermalSource.emit(.serious)       // techo default = .serious
+        h.thermalSource.emit(.serious)       // supera el techo default (.fair)
         await h.pump()
 
         #expect(h.state.status == .blockedThermal(.serious))

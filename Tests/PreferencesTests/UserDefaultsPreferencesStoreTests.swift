@@ -29,7 +29,7 @@ import Testing
         let snapshot = store.snapshot
 
         #expect(snapshot.batteryThreshold == 20)
-        #expect(snapshot.thermalCeiling == .serious)
+        #expect(snapshot.thermalCeiling == .fair)
         #expect(snapshot.hotkey == .defaultCombo)
         #expect(snapshot.batteryGuardEnabled)
         #expect(snapshot.thermalGuardEnabled)
@@ -134,7 +134,7 @@ import Testing
         let store = UserDefaultsPreferencesStore(defaults: defaults)
         let snapshot = store.snapshot
         #expect(snapshot.batteryThreshold == 20)
-        #expect(snapshot.thermalCeiling == .serious)
+        #expect(snapshot.thermalCeiling == .fair)
         #expect(snapshot.batteryGuardEnabled)
     }
 
@@ -150,7 +150,7 @@ import Testing
     @Test func testUnknownThermalRawValueFallsBackToDefault() {
         defaults.set(99, forKey: UserDefaultsPreferencesStore.Key.thermalCeiling)
         let store = UserDefaultsPreferencesStore(defaults: defaults)
-        #expect(store.snapshot.thermalCeiling == .serious)
+        #expect(store.snapshot.thermalCeiling == .fair)
     }
 
     @Test func testCorruptHotkeyFallsBackToDefaultCombo() {

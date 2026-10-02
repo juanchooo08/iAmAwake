@@ -72,3 +72,21 @@ cubiertos por tests porque son fáciles de romper:
 
 **NO maneja:** distinguir "hay ruta" de "internet responde". Ver la limitación 10
 del README.
+
+## ClaudeIdleGuard (agregado 2026-10-02)
+
+Desarma cuando ninguna sesión de Claude Code trabajó en
+`PreferencesSnapshot.claudeIdleSeconds` (10 min). Motivo: la Mac quedaba armada
+y caliente con la tapa cerrada horas después de que Claude terminaba.
+
+La señal son marcas que escriben los hooks de Claude Code
+(`Scripts/claude-activity-hook.sh`, instalado como
+`~/.claude/hooks/iamawake-activity.sh` y registrado en `~/.claude/settings.json`):
+un archivo por sesión en `~/Library/Application Support/iAmAwake/claude-sessions/`,
+creado o refrescado al recibir un prompt o usar una herramienta, borrado en
+`Stop`, `SessionEnd` y cuando espera permiso o respuesta. Se descartó medir CPU:
+una sesión ociosa gasta ~1% y una esperando al modelo ~2%, no se separan.
+
+- Una marca sin tocar hace 20 min cuenta como sesión muerta (Esc o proceso
+  matado a mitad de turno no disparan `Stop`).
+- `didArm()` reinicia la cuenta: se puede armar antes de lanzar la sesión.

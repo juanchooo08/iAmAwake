@@ -6,7 +6,7 @@ public enum ThermalLevel: Int, Comparable, Codable, Sendable {
     public static func < (a: ThermalLevel, b: ThermalLevel) -> Bool { a.rawValue < b.rawValue }
 }
 
-public enum GuardID: String, Codable, Sendable, CaseIterable { case battery, thermal, network }
+public enum GuardID: String, Codable, Sendable, CaseIterable { case battery, thermal, network, claude }
 
 public enum AwakeError: Error, Equatable, Sendable {
     case assertionFailed(kern_return_t)
@@ -24,6 +24,8 @@ public enum DisarmReason: Equatable, Sendable {
     /// Se cayo la red y no volvio dentro del margen. `afterSeconds` es el margen
     /// que se agoto, no el tiempo total sin conexion.
     case networkLost(afterSeconds: Int)
+    /// Ninguna sesion de Claude Code trabajo durante `afterSeconds`.
+    case claudeIdle(afterSeconds: Int)
     case assertionFailure(AwakeError)
     case appTerminating
 }
@@ -34,6 +36,7 @@ public enum ArmState: Equatable, Sendable {
     case blockedLowBattery(percent: Int)
     case blockedThermal(ThermalLevel)
     case blockedNetworkLost(afterSeconds: Int)
+    case blockedClaudeIdle(afterSeconds: Int)
     case failed(AwakeError)
 
     public var isArmed: Bool { self == .armed }
@@ -105,21 +108,27 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
     /// Cuanto tiene que estar caida la red antes de desarmar. Un margen chico
     /// desarma ante un salto de WiFi; uno grande gasta bateria al pedo.
     public var networkGraceSeconds: Int
+    /// Desarmar cuando ninguna sesion de Claude Code trabaja hace
+    /// `claudeIdleSeconds`. Sin esto la Mac quedaba despierta y caliente con la
+    /// tapa cerrada horas despues de que Claude termino.
+    public var claudeGuardEnabled: Bool
     /// Animacion de parpado al cerrar y abrir la tapa.
     public var animationsEnabled: Bool
 
     public static let batteryThresholdRange = 5...50
     public static let networkGraceRange = 0...1800
+    public static let claudeIdleSeconds = 600
 
     public init(
         batteryThreshold: Int = 20,
-        thermalCeiling: ThermalLevel = .serious,
+        thermalCeiling: ThermalLevel = .fair,
         hotkey: HotkeyCombo = .defaultCombo,
         curtainHotkey: HotkeyCombo = .defaultCurtainCombo,
         batteryGuardEnabled: Bool = true,
         thermalGuardEnabled: Bool = true,
         networkGuardEnabled: Bool = true,
         networkGraceSeconds: Int = 300,
+        claudeGuardEnabled: Bool = true,
         animationsEnabled: Bool = true
     ) {
         self.batteryThreshold = batteryThreshold
@@ -130,6 +139,7 @@ public struct PreferencesSnapshot: Equatable, Codable, Sendable {
         self.thermalGuardEnabled = thermalGuardEnabled
         self.networkGuardEnabled = networkGuardEnabled
         self.networkGraceSeconds = networkGraceSeconds
+        self.claudeGuardEnabled = claudeGuardEnabled
         self.animationsEnabled = animationsEnabled
     }
 

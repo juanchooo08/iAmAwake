@@ -19,6 +19,7 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
         static let curtainHotkeyModifiers = "curtainHotkeyModifiers"
         static let batteryGuardEnabled = "batteryGuardEnabled"
         static let thermalGuardEnabled = "thermalGuardEnabled"
+        static let claudeGuardEnabled = "claudeGuardEnabled"
     }
 
     private let defaults: UserDefaults
@@ -91,7 +92,8 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
             curtainHotkey: combo(defaults, Key.curtainHotkeyKeyCode, Key.curtainHotkeyModifiers)
                 ?? fallback.curtainHotkey,
             batteryGuardEnabled: bool(defaults, Key.batteryGuardEnabled) ?? fallback.batteryGuardEnabled,
-            thermalGuardEnabled: bool(defaults, Key.thermalGuardEnabled) ?? fallback.thermalGuardEnabled
+            thermalGuardEnabled: bool(defaults, Key.thermalGuardEnabled) ?? fallback.thermalGuardEnabled,
+            claudeGuardEnabled: bool(defaults, Key.claudeGuardEnabled) ?? fallback.claudeGuardEnabled
         )
         snapshot = snapshot.clamped()
         return snapshot
@@ -106,6 +108,7 @@ public final class UserDefaultsPreferencesStore: PreferencesStoring, @unchecked 
         defaults.set(Int(snapshot.curtainHotkey.modifiers), forKey: Key.curtainHotkeyModifiers)
         defaults.set(snapshot.batteryGuardEnabled, forKey: Key.batteryGuardEnabled)
         defaults.set(snapshot.thermalGuardEnabled, forKey: Key.thermalGuardEnabled)
+        defaults.set(snapshot.claudeGuardEnabled, forKey: Key.claudeGuardEnabled)
     }
 
     /// Solo acepta numeros reales. Un `String`, un `Data` o un diccionario dan `nil`

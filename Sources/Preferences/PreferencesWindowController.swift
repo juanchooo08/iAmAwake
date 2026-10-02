@@ -89,6 +89,16 @@ struct PreferencesView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section("Guarda de Claude") {
+                Toggle("Desarmar cuando Claude termine", isOn: $viewModel.claudeGuardEnabled)
+                Text("""
+                    Tras \(PreferencesSnapshot.claudeIdleSeconds / 60) min sin ninguna sesión \
+                    de Claude Code trabajando, la Mac vuelve a poder dormir.
+                    """)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Animación") {
                 Toggle("Animar el párpado al cerrar y abrir la tapa", isOn: $viewModel.animationsEnabled)
                 Text("""

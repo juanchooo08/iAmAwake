@@ -41,6 +41,10 @@ public final class PowerState: ObservableObject {
     public func requestArm() async {
         guard !status.isArmed else { return }
 
+        for g in guards {
+            g.didArm()
+            verdicts[g.identifier] = g.currentVerdict
+        }
         if let blocking = firstBlockingReason() {
             status = blockedState(for: blocking)
             await notifier.notifyDisarmed(reason: blocking)
@@ -85,7 +89,7 @@ public final class PowerState: ObservableObject {
         switch reason {
         case .user, .appTerminating:
             status = .disarmed
-        case .lowBattery, .thermal, .networkLost:
+        case .lowBattery, .thermal, .networkLost, .claudeIdle:
             status = blockedState(for: reason)
         case .assertionFailure(let e):
             status = .failed(e)
@@ -154,6 +158,7 @@ public final class PowerState: ObservableObject {
         case .lowBattery(let p): return .blockedLowBattery(percent: p)
         case .thermal(let l): return .blockedThermal(l)
         case .networkLost(let seconds): return .blockedNetworkLost(afterSeconds: seconds)
+        case .claudeIdle(let seconds): return .blockedClaudeIdle(afterSeconds: seconds)
         case .assertionFailure(let e): return .failed(e)
         case .user, .appTerminating: return .disarmed
         }
@@ -161,7 +166,7 @@ public final class PowerState: ObservableObject {
 
     private func isBlocked(_ s: ArmState) -> Bool {
         switch s {
-        case .blockedLowBattery, .blockedThermal, .blockedNetworkLost, .failed: return true
+        case .blockedLowBattery, .blockedThermal, .blockedNetworkLost, .blockedClaudeIdle, .failed: return true
         case .armed, .disarmed: return false
         }
     }

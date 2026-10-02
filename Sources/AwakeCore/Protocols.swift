@@ -57,6 +57,18 @@ public protocol Guarding: AnyObject, Sendable {
     func apply(_ prefs: PreferencesSnapshot)
     /// Veredicto actual sin esperar a la proxima notificacion del sistema.
     var currentVerdict: GuardVerdict { get }
+    /// El usuario armo. Las guardas que miden inactividad reinician su cuenta
+    /// aca: si no, armar antes de empezar a trabajar se rechazaria al instante.
+    func didArm()
+}
+
+public extension Guarding {
+    func didArm() {}
+}
+
+/// Hay alguna sesion de Claude Code trabajando ahora mismo.
+public protocol ClaudeActivityReading: AnyObject, Sendable {
+    func isActive() -> Bool
 }
 
 @MainActor
